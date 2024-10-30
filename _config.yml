@@ -14,9 +14,9 @@ future: true
 # SNS settings
 RSS: false
 #weibo_username: 无
-zhihu_username: Demons
+#zhihu_username: Demons
 github_username: RyanAqu
-twitter_username: GALAXY
+#twitter_username: GALAXY
 #facebook_username:  huxpro
 #linkedin_username:  firstname-lastname-idxxxx
 
@@ -59,7 +59,7 @@ kramdown:
       start_line: 1
 
 # Disqus settings
-disqus_username: hux
+disqus_username: Ryan
 
 # Netease settings
 netease_comment: false
