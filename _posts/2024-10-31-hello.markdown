@@ -1,0 +1,15 @@
+---
+layout:     post
+title:      "Hello 2015"
+subtitle:   " \"Hello World, Hello Blog\""
+date:       2024-10-31 16:17:00
+author:     "ryan"
+header-img: "img/post-bg-2015.jpg"
+catalog: true
+tags:
+    - git
+    - markdown
+---
+
+> “Yeah It's on. ”
+
