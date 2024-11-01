@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      "Hello 2024"
-subtitle:   " \"Hello World, Hello Blog\""
+subtitle:   " \"Hello World, Hello Blog, Hello Git, Hello MD \""
 date:       2024-10-31 16:17:00
 author:     "ryan"
 header-img: "img/post-bg-2015.jpg"
@@ -23,9 +23,62 @@ Ryan的博客就这样开通了。在一个东大4系的无线研究生，正式
 
 拜托，有一个独立的博客和website真的很酷哎！
 
-# 第一篇博客，就从git和markdown开始！
+# 第一篇博客，从git和markdown开始
+## GIT
+在使用github搭建博客的过程中，学习了git管理代码仓库，最初fork了 [Huxpro/huxpro.github.io][1]，然后下载代码仓到本地进行修改「下载到本地的原因是因为在github网页上修改不方便」。使用http或者SSH链接和git bash进行下载，如果直接下载代码仓zip文件，文件没有.git隐藏文件，所以最好用git bash下载。[git程序下载与使用参考][2]
+### Git Bash初始化
+打开git-bash.exe，在桌面快捷方式/开始菜单/安装目录中
+
+因为Git是分布式版本控制系统，所以需要填写用户名和邮箱作为一个标识，用户和邮箱为你github注册的账号和邮箱
+```
+git config --global user.name "你的GitHub昵称"
+git config --global user.email "你的GitHub邮箱"
+```
+### Github账户设置SSH key
+Git Bash生成密钥，然后在http://github.com 里设置密钥「为什么要这么做？因为好用」
+
+首先cd到用户文件夹检查是否有.ssh密钥
+```
+cd C:\Users\你的用户名\.ssh
+```
+生成ssh密钥
+```
+ssh-keygen -t rsa -C “你的邮箱”
+```
+生成成功后，去对应目录C:\Users\你的电脑用户名\.ssh里，用记事本打开id_rsa.pub，得到ssh key公钥，直接复制到github头像下的settings，找到SSH and GPG keys添加一个new ssh，为它命名，将记事本内容复制到key的文本框
+![image](https://github.com/user-attachments/assets/e7434372-9ea3-41f5-9550-b0424bf42a6b)
+### 将本地项目目录变成GitHub代码仓
+假如你在本地已经有了一个项目目录，但是还没有用github管理
+
+首先cd到项目目录下，然后
+```
+git init //把这个目录变成Git可以管理的仓库，命令完成后会在目录下生成一个.git的隐藏目录，此文件夹用来跟踪管理版本库
+```
+### 关联GitHub上的远程代码仓
+```
+git remote add origin git@github.com:******* //关联远程仓库
+```
+### clone已有代码仓
+```
+git clone git@github.com:RyanAqu/RyanAqu.github.io.git //克隆github代码仓到本地，包含版本信息
+```
+### commit提交本地代码到仓库
+```
+git add . //add全部文件到tree 
+git commit -m "first commit" //把文件提交到仓库，“”内是提交描述，commit会生成哈希文件
+```
+### push提交本地代码仓到远程仓库
+```
+git push -u origin master //把本地库的所有内容推送到远程库上
+```
+### 跟踪git的流程
+```
+git log //查看提交记录
+git status //查看仓库状态
+```
+## MARKDOWN
 
 
 
-
-
+[1]:https://github.com/Huxpro/huxpro.github.io
+[2]:https://zhuanlan.zhihu.com/p/193140870
