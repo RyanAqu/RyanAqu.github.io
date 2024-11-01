@@ -217,10 +217,32 @@ ___这是粗斜体___
 | 表头一(左对齐) | 表头二（居中对齐） | 表头三（右对齐） |
 |:---|:---:|---:|
 | 单元格 | 单元格 | 单元格 |
+### 链接
+```
+[百度](https://www.baidu.com)
+```
+[百度](https://www.baidu.com)
+```
+[百度][3]
 
+[3]:https://www.baidu.com  (在文末写)
+```
+[百度][3]
+### 对齐标签
+```
+<p align="left">内容在这里</p>
+<p align="ceter">内容在这里</p>
+<p align="right">内容在这里</p>
+<p align="justify">内容在这里</p>
+```
+<p align="left">内容在这里</p>
+<p align="ceter">内容在这里</p>
+<p align="right">内容在这里</p>
+<p align="justify">内容在这里</p>
 
 
 
 
 [1]:https://github.com/Huxpro/huxpro.github.io
 [2]:https://zhuanlan.zhihu.com/p/193140870
+[3]:https://www.baidu.com
