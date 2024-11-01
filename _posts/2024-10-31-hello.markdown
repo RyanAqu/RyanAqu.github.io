@@ -26,6 +26,8 @@ Ryan的博客就这样开通了。在一个东大4系的无线研究生，正式
 # 第一篇博客，从git和markdown开始
 ## GIT
 在使用github搭建博客的过程中，学习了git管理代码仓库，最初fork了 [Huxpro/huxpro.github.io][1]，然后下载代码仓到本地进行修改「下载到本地的原因是因为在github网页上修改不方便」。使用http或者SSH链接和git bash进行下载，如果直接下载代码仓zip文件，文件没有.git隐藏文件，所以最好用git bash下载。[git程序下载与使用参考][2]
+![image](https://github.com/user-attachments/assets/1f246fed-925c-4038-a924-3a4005e4c7a9)
+
 ### Git Bash初始化
 打开git-bash.exe，在桌面快捷方式/开始菜单/安装目录中
 
@@ -76,7 +78,7 @@ git push -u origin master //把本地库的所有内容推送到远程库上
 git log //查看提交记录
 git status //查看仓库状态
 ```
-## MARKDOWN
+## MARKDOWN语法
 
 
 
