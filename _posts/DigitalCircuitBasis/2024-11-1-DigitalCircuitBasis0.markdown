@@ -14,4 +14,4 @@ tags:
 
 决定准备一下逻辑/FPGA/数字IC验证，就从复习数电开始吧
 
-![CATALOG](../../img/inpost_dcb/dcb_catalog.jpg  "catalog")
+![CATALOG](../../img/inpost_dcb/dcb_catalog.png  "catalog")
