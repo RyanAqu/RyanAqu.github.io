@@ -1,13 +1,14 @@
 ---
 layout:     post
-title:      "DigitalCircuitBasis_Note0"
-subtitle:   " \"学习ing……\""
+title:      "术语和常用电平标准"
+subtitle:   " \"learning……\""
 date:       2024-11-01 20:36:00
 author:     "Ryan"
 header-img: "img/post-bg-dcb.jpg"
 catalog: true
 tags:
     - DigitalCircuitBasis
+    - 常用电平标准
 ---
 
 >He tosses and he turns again throughout the night to ease the pain. The laughter dies inside his head,only tears remain.
