@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "术语和常用电平标准"
+title:      "数电术语和常用电平标准"
 subtitle:   " \"learning……\""
 date:       2024-11-01 20:36:00
 author:     "Ryan"
