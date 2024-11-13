@@ -2,12 +2,13 @@
 layout:     post
 title:      "VerilogHDL Catalog"
 subtitle:   " \"learning……\""
-date:       4024-11-13 16:57:00
+date:       2024-11-13 16:57:00
 author:     "Ryan"
 header-img: "img/post-bg-dcb.jpg"
 catalog: true
 tags:
     - verilog
+    - catalog
 ---
 
 > 种一棵树最好的时间是十年前，其次就是今天。
