@@ -15,8 +15,6 @@ tags:
 
 复习一下数电
 
-![CATALOG](https://ryanaqu.github.io/img/inpost_dcb/dcb_catalog.png  "catalog")
-
 # 一些数电术语
 ## 集成电路规模
 集成电路按照 <u>集成度</u>（每一芯片包含的门电路的个数）对电路规模进行区分  
