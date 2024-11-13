@@ -24,7 +24,8 @@ tags:
 > MSI - 中规模集成电路（Medium-Scale Integration）  
 > LSI - 大规模集成电路（Large-Scale Integration）  
 > VLSI - 超大规模集成电路（Very-Large-Scale Integration）  
-> ULSI - 极大规模集成电路（Ultra-Large-Scale Integration）  
+> ULSI - 极大规模集成电路（Ultra-Large-Scale Integration）
+
 ## ASIC与SOC
 > ASIC - 应用特定集成电路（Application-Specific Integrated Circuit）    
 > SOC - 片上系统（System on Chip）  
