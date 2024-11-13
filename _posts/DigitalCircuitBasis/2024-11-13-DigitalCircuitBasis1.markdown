@@ -52,11 +52,12 @@ $(xxx)_{16}$ 或 $(xxx)_H$
 $(xxx)_D=\sum数码*位权$
 
 ## 十进制转其他进制
-
-
+十进制转二进制遵循以下原则：
+* 整数部分采用“除基取余法”
+* 小数部分采用“乘基取整法”
+![](https://ryanaqu.github.io/img/inpost_dcb/dec2any.png)
 
 # 码制
-
-
-
+## 8421BCD码&5421BCD码&2421BCD码  
+![](https://ryanaqu.github.io/img/inpost_dcb/dcb_codes.png)
 
