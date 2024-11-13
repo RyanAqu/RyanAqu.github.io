@@ -248,9 +248,24 @@ ___这是粗斜体___
 <p align="right">内容在这里</p>
 <p align="justify">内容在这里</p>
 
+### 公式
+公式有行内公式和行间公式两种，涉及到的语法较为复杂，以下为一个简单例子,具体参考CSDN论坛[markdown公式编辑][4]
+```
+$\Gamma(z) = \int_0^\infty t^{z-1}e^{-t}dt\,.$ 
+$$
+\Gamma(z) = \int_0^\infty t^{z-1}e^{-t}dt\,.
+$$
+```
+$\Gamma(z) = \int_0^\infty t^{z-1}e^{-t}dt\,.$ 
+
+$$
+\Gamma(z) = \int_0^\infty t^{z-1}e^{-t}dt\,.
+$$
 
 
 
 [1]:https://github.com/Huxpro/huxpro.github.io
 [2]:https://zhuanlan.zhihu.com/p/193140870
 [3]:https://www.baidu.com
+[4]:https://blog.csdn.net/qq_45691197/article/details/138620724?spm=1001.2014.3001.5506
+
