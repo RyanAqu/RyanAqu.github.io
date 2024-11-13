@@ -2,7 +2,7 @@
 layout:     post
 title:      "数制&码制"
 subtitle:   " \"learning……\""
-date:       2024-11-13 16:57:00
+date:       2024-11-13 22:57:00
 author:     "Ryan"
 header-img: "img/post-bg-dcb.jpg"
 catalog: true
@@ -17,6 +17,7 @@ tags:
 # 数制
 ## 各进制
 ### 十进制
+
 $x_d$
 
 ### 二进制
