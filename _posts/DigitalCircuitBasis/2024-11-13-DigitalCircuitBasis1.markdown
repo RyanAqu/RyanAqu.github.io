@@ -64,3 +64,6 @@ $(xxx)_D=\sum数码*位权$
 ## 8421BCD码&5421BCD码&2421BCD码  
 ![](https://ryanaqu.github.io/img/inpost_dcb/dcb_codes.png)
 
+$(36)_D=(0011\ \ 0110) _{8421BCD}$  
+$(4.79)_D=(0100.\ \ 0111\ \ 1001) _{8421BCD}$  
+$(10)_D=(0001\ \ 0000) _{8421BCD}$  
