@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "GrayCoder&GrayDecoder"
+title:      "VerilogHDL GrayCoder&GrayDecoder"
 subtitle:   " \"4bit格雷编码器译码器仿真实现\""
 date:       2024-11-14 17:06:00
 author:     "Ryan"
