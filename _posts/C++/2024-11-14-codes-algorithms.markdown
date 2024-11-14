@@ -2,7 +2,7 @@
 layout:     post
 title:      "C++ & Basic Algorithms"
 subtitle:   " \"learning……\""
-date:       2024-11-14 20:06:00
+date:       3024-11-14 20:06:00
 author:     "Ryan"
 header-img: "img/bg-walle.jpg"
 catalog: true
