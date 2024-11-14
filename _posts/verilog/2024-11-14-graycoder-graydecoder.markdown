@@ -8,7 +8,7 @@ header-img: "img/post-bg-dcb.jpg"
 catalog: true
 tags:
     - verilog
-    - gray
+    - 格雷编码
 ---
 
 > 有时候赤心在祸心之下，英雄在狗熊之间
