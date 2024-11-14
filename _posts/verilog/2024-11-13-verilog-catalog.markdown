@@ -19,7 +19,7 @@ tags:
 [Verilog代码仓库][1]
 
 ## 入门
-[4bit格雷编码器/译码器][2]  [文档][3]
+[4bit格雷编码器/译码器][2] [总结文档][3]
 ## 登堂入室
 
 ## 登峰造极
@@ -31,3 +31,6 @@ tags:
 
 [1]:https://github.com/RyanAqu/Verilogs
 [2]:https://github.com/RyanAqu/Verilogs/tree/main/graycoder
+[3]:https://ryanaqu.github.io/_posts/verilog/2024-11-14-graycoder-graydecoder.markdown
+
+
