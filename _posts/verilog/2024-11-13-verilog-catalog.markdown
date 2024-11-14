@@ -31,6 +31,6 @@ tags:
 
 [1]:https://github.com/RyanAqu/Verilogs
 [2]:https://github.com/RyanAqu/Verilogs/tree/main/graycoder
-[3]:https://ryanaqu.github.io/_posts/verilog/2024-11-14-graycoder-graydecoder.markdown
+[3]:https://ryanaqu.github.io/2024/11/14/graycoder-graydecoder/
 
 
