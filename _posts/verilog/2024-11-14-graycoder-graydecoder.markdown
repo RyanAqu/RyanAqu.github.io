@@ -25,7 +25,7 @@ $G_1=B_2⊕B_1$
 $G_0=B_1⊕B_0$  
 其中，⊕表示异或操作。
 
-
+![格雷编码原理](https://ryanaqu.github.io/img/inpost_verilog/graycoder.png)
 ### Verilog代码
 模块代码：
 ```
