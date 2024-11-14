@@ -8,8 +8,7 @@ header-img: "img/post-bg-dcb.jpg"
 catalog: true
 tags:
     - DigitalCircuitBasis
-    - 数制
-    - 码制
+    - 数制&码制
 ---
 
 > 情感激励大师&青春疼痛文学作者
