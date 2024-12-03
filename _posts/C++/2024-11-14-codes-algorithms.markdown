@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "C++ & Basic Algorithms"
+title:      "C++ Catalog"
 subtitle:   " \"learning……\""
 date:       3024-11-14 20:06:00
 author:     "Ryan"
@@ -9,6 +9,7 @@ catalog: true
 tags:
     - c++
     - 基础算法
+    - catalog
 ---
 
 > 生活破破烂烂，小猫尝尝咸淡
