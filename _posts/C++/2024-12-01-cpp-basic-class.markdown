@@ -952,6 +952,7 @@ public:
 1. 全局函数做友元：让全局函数可以访问一个类的私有变量，定义一个全局函数，在类里面申明友元，即可以访问私有成员。friend void goodgay(Building& building);  
 2. 类做友元：为了让一个类可以访问另一个类的私有变量friend class GoodGay;  
 3. 成员函数做友元friend void GoodGay::visit();
+
 ```
 class Building
 {
