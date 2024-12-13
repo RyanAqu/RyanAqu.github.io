@@ -17,9 +17,8 @@ tags:
 这是一篇C++学习的笔记汇总帖，边复习边记录。
 
 # C++
-[C Basic & C With Classes][0]
-
-[C++ 泛型 & STL 标准模板库][1]
+[C Basic & C With Classes][0]  
+[C++ 泛型 & STL 标准模板库][1]  
 
 
 
