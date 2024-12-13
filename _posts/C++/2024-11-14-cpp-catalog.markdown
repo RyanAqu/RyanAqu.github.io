@@ -18,6 +18,7 @@ tags:
 
 # C++
 [C Basic & C With Classes][0]
+[C++ 泛型 & STL 标准模板库][1]
 
 
 
@@ -26,4 +27,6 @@ tags:
 
 
 [0]:https://ryanaqu.github.io/2024/12/01/cpp-basic-class/
+[1]:https://ryanaqu.github.io/2024/12/13/cpp-generic-stl/
+
 
