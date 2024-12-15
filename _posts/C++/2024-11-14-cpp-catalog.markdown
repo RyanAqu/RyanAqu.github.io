@@ -20,7 +20,8 @@ tags:
 [C Basic & C With Classes][0]  
 [C++ 泛型 & STL 标准模板库][1]  
 
-
+# Linux  
+[Linux 基础命令][2]  
 
 # 基础算法&数据结构
 
@@ -28,5 +29,7 @@ tags:
 
 [0]:https://ryanaqu.github.io/2024/12/01/cpp-basic-class/
 [1]:https://ryanaqu.github.io/2024/12/13/cpp-generic-stl/
+[2]:https://ryanaqu.github.io/2024/12/15/cpp-linux/
+
 
 
