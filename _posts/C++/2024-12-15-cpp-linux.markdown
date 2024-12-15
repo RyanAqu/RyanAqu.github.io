@@ -67,8 +67,9 @@ $ mkdir -p test4/subdir1          //在当前目录下同时创建多级文件�
 
 ## Linux 文件权限  
 看以下这个文件目录的头部，其中d代表directory文件夹类型，d后面跟着的前三个rwx代表当前用户（user）的权限为**读写执行**，中间三个rwx代表和你同组（group）的人的权限为**读写执行**，最后三个r-x代表其他组（others）的权限为**读执行**  
-**drwxrwxr-x**
-
+````
+drwxrwxr-x 2 test test  6 Dec 15 22:46 test1
+````
 
 
 
