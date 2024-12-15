@@ -26,6 +26,7 @@ tags:
 ## Linux 命令中的快捷键  
 1. 输入clear可以清屏  
 2. 输入pwd可以输出当前所在位置（目录）  
+3. 文档中输入q!可以退出编辑文档  
 
 ## echo 回声  
 ````
@@ -57,7 +58,12 @@ $ find . -type d                  //查找 目录(.) 以文件类型查找 direc
 $ find . -type l                  //查找 目录(.) 以文件类型查找 symbolic link符号链接
 ````
 
-
+## mkdir 创建文件夹目录  
+````
+$ mkdir test1                     //在当前目录下创建一个文件夹目录
+$ mkdir test2 test3               //在当前目录下同时创建多个文件夹目录
+$ mkdir -p test4/subdir1          //在当前目录下同时创建多级文件夹目录
+````
 
 
 
