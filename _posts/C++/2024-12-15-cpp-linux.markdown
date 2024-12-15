@@ -1,0 +1,14 @@
+---
+layout:     post
+title:      "Linux 常用命令"
+subtitle:   " \"learning……\""
+date:       2024-12-15 21:27:00
+author:     "Ryan"
+header-img: "img/bg-walle.jpg"
+catalog:    true
+tags:
+    - c++
+    - Linux
+---
+
+> 
