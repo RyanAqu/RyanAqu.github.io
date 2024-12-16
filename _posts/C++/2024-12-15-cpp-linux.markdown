@@ -17,7 +17,7 @@ tags:
 
 # Linux 基础命令
 
-## Linux命令中的符号  
+## Linux 命令中的符号  
 1. 单引号内的内容是强引用，都会被认为是字符，对变量输出而言双引号和不带引号效果一样  
 2. 反斜杠是续行符，比如$ echo \n ，只输出n
 3. 双感叹号!!，会输出上一个命令
@@ -26,7 +26,13 @@ tags:
 ## Linux 命令中的快捷键  
 1. 输入clear可以清屏  
 2. 输入pwd可以输出当前所在位置（目录）  
-3. 文档中输入q!可以退出编辑文档  
+3. 文档中输入q!可以退出编辑文档
+
+## Linux 文件权限  
+看以下这个文件目录的头部，其中d代表directory文件夹类型，d后面跟着的前三个rwx代表当前用户（user）的权限为**读写执行**，中间三个rwx代表和你同组（group）的人的权限为**读写执行**，最后三个r-x代表其他组（others）的权限为**读执行**  
+````
+drwxrwxr-x 2 test test  6 Dec 15 22:46 test1
+````
 
 ## echo 回声  
 ````
@@ -65,11 +71,54 @@ $ mkdir test2 test3               //在当前目录下同时创建多个文件�
 $ mkdir -p test4/subdir1          //在当前目录下同时创建多级文件夹目录
 ````
 
-## Linux 文件权限  
-看以下这个文件目录的头部，其中d代表directory文件夹类型，d后面跟着的前三个rwx代表当前用户（user）的权限为**读写执行**，中间三个rwx代表和你同组（group）的人的权限为**读写执行**，最后三个r-x代表其他组（others）的权限为**读执行**  
+## cp 复制命令  
 ````
-drwxrwxr-x 2 test test  6 Dec 15 22:46 test1
+$ cp test.txt test1.txt           //在当前目录下复制源文件成目标文件
+$ cp -r testdir testdir2          //在当前目录下复制源目录成目标目录
+$ cp -v test.txt testdir          //在当前目录下复制源文件到目标目录下
+$ cp -i test.txt test.txt         //询问是否覆盖
 ````
+
+## cat 查看文件内容命令
+````
+$ cat testfile1.txt               //查看文件所有内容
+$ cat -n testfile1.txt            //显示行号
+$ cat -s testfile1.txt            //不打印空行
+$ cat -E testfile1.txt            //$标志行开始
+$ cat -T testfile1.txt            //将tab键变成^输出
+````
+
+## rm 删除命令
+````
+$ rm testfile.txt                 //删除文件
+$ rm -r test1                     //删除目录
+$ rm -i -r test1                  //删除目录，并且询问是否删除
+````
+
+## wc 计数命令
+````
+$ wc testfile.txt                 //打印文本中的行数 单词数 字节数
+$ wc -l testfile.txt              //单独打印文本中的行数
+$ wc -w testfile.txt              //单独打印文本中的单词数
+$ wc -c testfile.txt              //单独打印文本中的字节数
+$ wc -m testfile.txt              //单独打印文本中的字符数
+````
+
+## tar 压缩和解压
+````
+$ tar -cf testdir.tar testdir     //压缩
+$ tar -xf testdir.tar             //解缩
+````
+
+
+
+
+
+
+
+
+
+
 
 
 
