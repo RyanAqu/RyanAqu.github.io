@@ -411,7 +411,6 @@ $ useradd -g groupname username    //加入组
 $ useradd -G group1,group2 username//加入多个组
 $ useradd -u 1001 username//指定用户ID
 $ useradd -e YYYY-MM-DD username   //指定密码有效期
-$ userdel username             //删除用户账户
 ````
 ![image](https://github.com/user-attachments/assets/47df7369-437c-441f-b6d6-7d63f2dd04eb)
 
@@ -419,18 +418,43 @@ $ userdel username             //删除用户账户
 ````
 $ usermod -c "描述信息"        //添加描述信息
 $ usermod -g groupname username//换组
+$ usermod -l newname oldname   //改名
 ````
 
+### userdel 删除命令 
+````
+$ userdel username             //删除用户账户，但不删除邮件和家目录
+$ userdel -r username          //删除用户账户，且删除所有文件
+````
 
+### group 组  
+````
+$ groupadd groupname           //新增组
+$ groupadd -g 1010 groupname   //新增组,指定组ID
+$ groupdel groupname           //删除组
+$ groupmod -g 1111 newgrouname //修改组名和组ID
+````
 
+### chown 
+更改文件或目录的所有者和/或所属组  
+````
+$ chown username file            //将文件 file 的所有者更改为 username
+$ chown :groupname file          //将文件 file 的所属组更改为 groupname
+$ chown -R username:groupname directory/        //递归更改目录及其内容的所有者和组
+$ chown 1001:1002 file           //修改文件所有者UID和所属组GID
+````
+![image](https://github.com/user-attachments/assets/d276270b-fe17-4460-86e4-dd4776e0ee00)
 
+### chmod  
+![image](https://github.com/user-attachments/assets/d080e7b6-0ab2-47cf-8ce5-74269470c207)
+![image](https://github.com/user-attachments/assets/8d1ef3a4-9b14-4733-86cb-7c93d482922d)
 
-
-
-
-
-
-
+````
+$ chmod u+rw fliename             //用户增加对本文件的读写权限
+$ chmod u+rw dir                  //用户增加对本目录的读写权限
+$ chmod g-rw fliename             //组解除对本文件的读写权限
+$ chmod 777 filename              //数字表示法
+````
 
 
 
