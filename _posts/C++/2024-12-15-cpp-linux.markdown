@@ -176,9 +176,17 @@ ZQ 不保存并退出# 末行模式(:):
 :pwd 显示当前所在的路径
 ````
 
+## grep 命令
+````
+$ grep -i hello testfile1.txt            //匹配所有包含hello的文本并输出
+$ grep -w hello testfile1.txt            //严格匹配hello的文本并输出
+$ grep -n hello testfile1.txt            //匹配所有包含hello的文本并输出并显示行号
+$ grep -e hello -e today testfile1.txt   //匹配多个文本并输出并显示行号
+$ grep -r hello testdir/                 //递归查找目录下包含hello的文件
+````
 
-
-
+正则表达式：  
+![image](https://github.com/user-attachments/assets/8062b485-4c0c-43dc-834c-37d530ef78dd)
 
 
 
