@@ -394,6 +394,20 @@ $ mv -f file1.txt /path/to/destination/ //强制移动force
 $ mv -v file1.txt /path/to/destination/ //-v（verbose）显示详细的移动过程，列出每个文件的移动情况。
 ````
 
+### alias  
+给很长的命令取别名，这样可以简化使用  
+````
+$ alias cp='cp -i'
+````
+
+### cut  
+### tr  
+### sort  
+### unique
+### watch  
+### top  
+
+
 ## 权限管理  
 
 ### Linux 文件权限  
@@ -454,7 +468,30 @@ $ chmod u+rw fliename             //用户增加对本文件的读写权限
 $ chmod u+rw dir                  //用户增加对本目录的读写权限
 $ chmod g-rw fliename             //组解除对本文件的读写权限
 $ chmod 777 filename              //数字表示法
+$ chmod 777 -R dir                //递归改权限
 ````
+
+### su 切换用户
+root用户切换任意用户都不需要密码，普通用户切换root用户或者普通用户之间互相切换，需要密码
+````
+$ su user1                        //切换
+````
+
+### sudo 超级用户  
+sudo权限更高，在命令前加sudo以获取权限，但是使用sudo需要密码和root用户配置权限。
+
+### hostname 
+````
+$ hostname                        //显示主机名
+$ hostname vm1                    //临时修改主机名
+````
+
+
+
+
+
+
+
 
 
 
