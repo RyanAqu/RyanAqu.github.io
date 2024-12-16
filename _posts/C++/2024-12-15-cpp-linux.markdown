@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "Linux 命令"
+title:      "Linux [ Shell [ Bash ]]"
 subtitle:   " \"learning……\""
 date:       2024-12-15 21:27:00
 author:     "Ryan"
@@ -13,7 +13,7 @@ tags:
 
 > 枪响了，他没有死去，子弹在头骨上开了个指头大小的脑洞。他疑惑地把手指插进，发现伤口融化成回忆，酸楚涌入脑浆。子弹打通了堵塞的思绪，透过弹孔回忆起她的故事...
 
-复习一下实习时用过的Linux命令，温故而后知新~
+复习一下实习时用过的Linux命令，然后温故而后知新~
 
 # Linux 基础
 
