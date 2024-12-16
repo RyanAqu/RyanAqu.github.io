@@ -405,7 +405,7 @@ $ alias cp='cp -i'
 ### sort  
 ### unique
 ### watch  
-### top  
+  
 
 
 ## 权限管理  
@@ -486,7 +486,7 @@ $ hostname                        //显示主机名
 $ hostname vm1                    //临时修改主机名
 ````
 
-
+## top实时监控
 
 
 
