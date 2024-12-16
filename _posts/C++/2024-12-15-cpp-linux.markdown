@@ -107,11 +107,16 @@ $ wc -m testfile.txt              //单独打印文本中的字符数
 ## tar 压缩和解压
 ````
 $ tar -cf testdir.tar testdir     //压缩
+$ tar -zcf testdir.tar.gz testdir //压缩成tar.gz
 $ tar -xf testdir.tar             //解缩
 ````
 
-
-
+## tail 查看文件尾
+````
+$ tail testfile1.txt              //查看文件倒数十行内容
+$ tail -n 5 testfile1.txt         //查看文件倒数五行内容
+$ tail -f test.log                //跟踪log
+````
 
 
 
