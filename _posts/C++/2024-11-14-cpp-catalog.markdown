@@ -18,9 +18,11 @@ tags:
 
 **C++ 嵌软**
 
-![2(KROQ}2LM8()9XE$V8VIMJ](https://github.com/user-attachments/assets/d664db4e-d397-4c8c-926d-ecfb3097112b)  
+![image](https://github.com/user-attachments/assets/d664db4e-d397-4c8c-926d-ecfb3097112b)  
 
 **C++ 后端**
+
+![image](https://github.com/user-attachments/assets/2c7ebfa1-32e2-4241-a5c2-405a00b2f7ac)
 
 ![image](https://github.com/user-attachments/assets/03e341b8-0629-45cc-a518-f6342cd60bb1)
 
