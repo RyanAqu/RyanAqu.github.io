@@ -55,6 +55,9 @@ tags:
 
 ![image](https://github.com/user-attachments/assets/6520bf80-977f-4b7a-b0d1-95d88cf049d4)
 
+![image](https://github.com/user-attachments/assets/e59c0dad-bf32-4d7c-93a1-6ab0b0e588b6)
+
+
 1. 冒泡排序，无脑两两比较交换，稳定
 2. 选择排序，每次遍历将目标值（最大/最小）筛选出来填到预留位置（最前/最后），指针后移，不稳定，选择比冒泡比较次数少
 3. 插入排序，指针从第二个位置开始遍历，每次遍历将该数插入到前一段已经排好序的数组（数据后移），稳定，比选择排序比较次数少
