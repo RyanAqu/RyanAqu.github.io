@@ -16,6 +16,24 @@ tags:
 
 这是一篇C++学习的笔记汇总帖，边复习边记录。
 
+**C++ 嵌软**
+
+![2(KROQ}2LM8()9XE$V8VIMJ](https://github.com/user-attachments/assets/d664db4e-d397-4c8c-926d-ecfb3097112b)  
+
+**C++ 后端**
+
+![image](https://github.com/user-attachments/assets/03e341b8-0629-45cc-a518-f6342cd60bb1)
+
+![image](https://github.com/user-attachments/assets/a0926be0-dc3f-4cff-aba7-c561e2731be3)
+
+![image](https://github.com/user-attachments/assets/cf02b07a-10ca-4754-8375-cd657deee09f)
+
+
+
+
+
+
+
 # C++
 [C Basic & C With Classes][0]  
 [C++ 泛型 & STL 标准模板库][1]  
