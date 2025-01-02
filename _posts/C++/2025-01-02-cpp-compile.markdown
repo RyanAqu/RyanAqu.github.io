@@ -104,13 +104,16 @@ gcc main.c -o main -Iinclude/ -Llib/ -ladd
 * -L（库Lib）：告诉编译器在哪里找库文件
 * -l（小写的L）：要链接哪个动态库，写库名（即add）
 
-4. 添加环境变量  
+4. 添加环境变量
+
 ![image](https://github.com/user-attachments/assets/faf23505-a92b-432b-914e-5684fe354a52)
 
 可以把库路径添临时加进去：  
+
 ![image](https://github.com/user-attachments/assets/34317196-fe00-45ef-99ef-6b4ebd632dca)
 
 或者直接把库复制到~/lib下：
+
 ![image](https://github.com/user-attachments/assets/3499a628-43de-441f-ace8-b1a8a1830fca)
 
 
