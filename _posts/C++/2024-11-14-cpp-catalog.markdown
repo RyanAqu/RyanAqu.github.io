@@ -41,8 +41,8 @@ tags:
 [C++ 泛型 & STL 标准模板库][1]  
 
 # Linux 操作系统  
-[Linux 下 Bash 基础命令][2]  
-[Linux 下 C++ 编译][3]  
+[Linux 下 Bash 命令基础][2]  
+[Linux 下 C++ 编译基础][3]  
 
 # 基础算法&数据结构
 ## 双指针
