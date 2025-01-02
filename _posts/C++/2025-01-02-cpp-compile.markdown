@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "Compile Command"
+title:      "编译和库"
 subtitle:   " \"learning……\""
 date:       2025-01-02 17:16:00
 author:     "Ryan"
@@ -78,6 +78,7 @@ g++ main.o hello.o -o main                //默认动态链接，文件较小，
 
 
 # 静态库和动态库  
+在实际开发中，把通用的函数和类分文件编写，称之为库。在其他程序中，可以使用库中的函数和类。
 ## 静态库制作  
 ## 动态库制作  
 
