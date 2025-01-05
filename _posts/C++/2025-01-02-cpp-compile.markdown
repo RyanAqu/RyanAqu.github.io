@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "编译和库"
+title:      "g++ 编译和库制作"
 subtitle:   " \"learning……\""
 date:       2025-01-02 17:16:00
 author:     "Ryan"
