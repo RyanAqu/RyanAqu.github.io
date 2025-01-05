@@ -44,10 +44,10 @@ tags:
 
 # Linux 操作系统  
 [Linux 下 Bash 命令基础][2]  
-[Linux 下 C++ 编译基础][3]  
+[Linux 下 G++ 编译基础][3]  
 
 # 基础算法&数据结构
-
+[数据结构与基础算法][4]
 
 
 
@@ -56,6 +56,6 @@ tags:
 [1]:https://ryanaqu.github.io/2024/12/13/cpp-generic-stl/
 [2]:https://ryanaqu.github.io/2024/12/15/cpp-linux/
 [3]:https://ryanaqu.github.io/2025/01/02/cpp-compile/
-
+[4]:https://ryanaqu.github.io/2025/01/05/cpp-algorithm-datastructure/
 
 
