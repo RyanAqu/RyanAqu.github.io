@@ -138,11 +138,25 @@ ar -rc libadd.a add.o
 gcc main.c libadd.a -o main -Iinclude    //因为头文件不在一个地方，所以得指定
 ````
 
+# Makefile  
+我们在嵌入式开发的时候，有时在单片机上跑linux系统，或者在服务器上跑linux系统，常常是没有图形化界面的。我们无法使用便捷的vscode工具编译代码，所以需要这样一个工具去统一编译整个项目，即Makefile  
 
+## 工具下载  
+````
+sudo apt install -y build-essential
+````
 
+## make  
+控制台实现make，首先在项目内添加Makefile文件，文件名固定为**Makefile**，然后开始编写  
+````
+# Makefile内容通常有以下3部分内容组成
+# <目标名称>:<前置依赖>
+# \t<需要执行的命令>
 
-
-
+main: hello.o main.o
+	g++ hello.o main.o -o main
+````
+编写完成后控制台输入make既可以完成编译
 
 
 
