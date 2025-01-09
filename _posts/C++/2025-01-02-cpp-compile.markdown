@@ -153,6 +153,10 @@ sudo apt install -y build-essential
 # <目标名称>:<前置依赖>
 # \t<需要执行的命令>
 
+# 放在首位的是默认目标，名称为main
+# 目标是编译出mian文件，依赖hello.o main.o
+# 编译的命令是g++ hello.o main.o -o main
+# 如果前置依赖不存在，会先编译出依赖的.o文件
 main: hello.o main.o
 	g++ hello.o main.o -o main
 ````
