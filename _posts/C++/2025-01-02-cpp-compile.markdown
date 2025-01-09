@@ -160,7 +160,63 @@ sudo apt install -y build-essential
 main: hello.o main.o
 	g++ hello.o main.o -o main
 ````
-编写完成后控制台输入make既可以完成编译
+编写完成后控制台输入**make**既可以完成编译,本来应该加上前置依赖的生成命令，但make可以自动检测前置依赖的有无并且补全命令,但是此方法不推荐，因为无法监控依赖的.h文件的变化，只能自动推导出hello.o: hello.cpp  
+
+以下是带前置依赖的Makefile,-o以及后面的内容可以省略，工具会自动推导  
+````
+main: hello.o main.o
+	g++ hello.o main.o -o main
+
+main.o: main.cpp hello.h
+	g++ -c main.cpp -o main.o
+
+hello.o: hello.cpp hello.h
+	g++ -c hello.cpp -o hello.o
+
+````
+
+带自动推导的简化版本  
+````
+main: hello.o main.o
+	g++ hello.o main.o -o main
+
+main.o: hello.h
+
+hello.o: hello.h
+````
+
+
+## clean  
+在Makefile中添加clean语句  
+````
+main: hello.o main.o
+	g++ hello.o main.o -o main
+
+main.o: main.cpp hello.h
+	g++ -c main.cpp -o main.o
+
+hello.o: hello.cpp hello.h
+	g++ -c hello.cpp -o hello.o
+
+clean:
+	rm main.o hello.o
+````
+
+在make之后执行**make clean**命令可以将不需要的.o文件清除  
+
+## 伪目标  
+在写clean的时候，clean本身就是一个伪目标,但是如果目录下有一个clean，那么make clean会出现问题，所以需要显示申明clean是一个伪目标  
+````
+.PHONY: clean
+````
+
+
+
+
+
+
+
+
 
 
 
