@@ -141,12 +141,12 @@ gcc main.c libadd.a -o main -Iinclude    //因为头文件不在一个地方，�
 # Makefile  
 我们在嵌入式开发的时候，有时在单片机上跑linux系统，或者在服务器上跑linux系统，常常是没有图形化界面的。我们无法使用便捷的vscode工具编译代码，所以需要这样一个工具去统一编译整个项目，即Makefile  
 
-## 工具下载  
+### 工具下载  
 ````
 sudo apt install -y build-essential
 ````
 
-## make  
+### make  
 控制台实现make，首先在项目内添加Makefile文件，文件名固定为**Makefile**，然后开始编写  
 ````
 # Makefile内容通常有以下3部分内容组成
@@ -204,13 +204,40 @@ clean:
 
 在make之后执行**make clean**命令可以将不需要的.o文件清除  
 
-## 伪目标  
+### 伪目标  
 在写clean的时候，clean本身就是一个伪目标,但是如果目录下有一个clean，那么make clean会出现问题，所以需要显示申明clean是一个伪目标  
 ````
 .PHONY: clean
 ````
 
+### main函数的参数  
+main函数一般有三个参数，argc,argv,envp  
+* argc：自动检测输入的参数个数，其中第一个是程序本身的路径
+* argv：自动保存所有输入的参数，后续可以处理
+* envp：自动保存环境变量
 
+````
+#include<iostream>
+using namespace std;
+
+int main(int argc,char* argv[],char* envp[])
+{
+    /*
+    cout<<"There is "<<argc<<" arguments"<<endl;
+    for(int i=0;i<argc;++i)
+    {
+        cout<<argv[i]<<" ";
+    }cout<<endl;
+    */
+
+    for(int i=0;envp[i]!=0;++i)
+    {
+        cout<<envp[i]<<endl;
+    }
+
+    return 0;
+}
+````
 
 
 
