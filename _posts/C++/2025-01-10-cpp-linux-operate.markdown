@@ -105,8 +105,41 @@ int main()
 ### 删除目录  
 ![image](https://github.com/user-attachments/assets/cace5e54-6b8e-4d12-9853-10e8ef686858)
 
+### 读取目录下文件的demo  
 
+* 包含目录头文件<dirent.h>
+* 打开文件目录，并用指针保存目录
+* 读取目录下内容并输出
 
+````
+#include<iostream>
+#include<dirent.h> //目录操作头文件
+using namespace std;
+
+int main(int argc,char * argv[])
+{
+    if(argc!=2)
+    {
+        cout<<"格式错误：Using ./demo 目录名\n";
+        return -1;
+    }
+    DIR *dir;  //定义目录指针
+    //打开目录
+    if((dir=opendir(argv[1]))==0) return -1;
+    //存放从目录中读取的内容
+    struct dirent *stdinfo=nullptr;
+
+    while(1)
+    {
+        if((stdinfo=readdir(dir))==0) break;
+        cout<<"文件名="<<stdinfo->d_name<<"\t\t文件类型="<<(int)stdinfo->d_type<<endl;
+    }
+    //关闭目录
+    closedir(dir);
+
+    return 0;
+}
+````
 
 
 
