@@ -48,8 +48,8 @@ tags:
 # Linux 操作系统  
 [Linux 下 Bash 命令基础][2]  
 [Linux 下 g++ 编译基础][3]  
-[Linux 下 gdb 调试][5]
-[Linux 基础操作][6]
+[Linux 下 gdb 调试][5]  
+[Linux 系统操作基础][6]  
 
 
 
