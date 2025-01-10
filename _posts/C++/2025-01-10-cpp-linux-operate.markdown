@@ -70,9 +70,32 @@ int main()
 
 
 
+# Linux的目录操作  
+linux系统中目录的最大长度为255  
 
+### 当前目录地址获取  
+````
+#include<iostream>
+#include<unistd.h>
+using namespace std;
 
+int main()
+{
+    //方法1
+    char path1[256];//linux最大路径256,开辟栈空间
+    getcwd(path1,256);//获取当前路径
+    cout<<"path1="<<path1<<endl;
 
+    //方法2
+    char* path2=get_current_dir_name();
+    cout<<"path2="<<path2<<endl;
+    free(path2);
+    
+    return 0;
+}
+````
+
+### 切换工作目录
 
 
 
