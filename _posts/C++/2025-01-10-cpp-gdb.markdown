@@ -32,10 +32,41 @@ g++ test.cpp -o test
 g++ -g test.cpp -o test
 ````
 
+# gdb常用命令  
+如果希望程序可调试，编译时需要加入-g选项,且不能使用-O优化编译选项  
+
+### 常用调试命令  
+命令可以写全，也可以写简写  
+* set args设置程序参数
+* b代表break命令，后面跟行号，例如17
+* r代表run命令
+* n代表next命令，执行当前语句，如果该语句是函数调用，不会进入函数内部
+* s代表step命令，执行当前语句，如果该语句是函数调用，进入函数内部，如果是第三方库，则不会进入，因为没有源代码
+* c代表continue命令，程序继续执行，如果遇到断点再次停止，如果没遇到就一直执行
+* p代表print命令，可以查看变量的值,如果p后面是表达式，还可以查看表达式的值
+* q代表quit命令，可以退出gdb
+* set val命令可以手动改变变量的值，例如set val i=8可以在循环内改变循环变量当前的值
 
 
+````
+(gdb) set args ryan xy iou
+(gdb) b 17
+(gdb) r
+(gdb) n
+(gdb) c
+(gdb) s
+(gdb) p name1
+(gdb) p strlen(name1)
+(gdb) q
+(gdb) set val i=8
+````
 
-
+### gdb调试core文件  
+如果程序运行过程中发生了内存泄漏，会被内核强制停止，提示“段错误（吐核）”，内存的状态保存在core文件中，方便分析
+````
+ulimit -a            //查看资源限制
+ulimit -c unlimited  //-c是core选项，在-a之后会展示所有可选选项，unlimited是改的数值，代表无限
+````
 
 
 
