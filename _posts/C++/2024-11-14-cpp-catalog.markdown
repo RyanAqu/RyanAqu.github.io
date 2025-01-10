@@ -47,7 +47,8 @@ tags:
 
 # Linux 操作系统  
 [Linux 下 Bash 命令基础][2]  
-[Linux 下 G++ 编译基础][3]  
+[Linux 下 g++ 编译基础][3]  
+[Linux 下 gdb 调试][5]
 
 
 
@@ -59,5 +60,5 @@ tags:
 [2]:https://ryanaqu.github.io/2024/12/15/cpp-linux/
 [3]:https://ryanaqu.github.io/2025/01/02/cpp-compile/
 [4]:https://ryanaqu.github.io/2025/01/05/cpp-algorithm-datastructure/
-
+[5]:https://ryanaqu.github.io/2025/01/10/cpp-gdb/
 
