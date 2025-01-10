@@ -96,6 +96,7 @@ int main()
 ````
 
 ### 切换工作目录
+![image](https://github.com/user-attachments/assets/12f93cb9-f515-471b-aa55-c6b34d53f16a)
 
 
 
