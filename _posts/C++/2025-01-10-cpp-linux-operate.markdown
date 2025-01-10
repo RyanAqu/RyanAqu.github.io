@@ -62,8 +62,9 @@ int main()
 ![image](https://github.com/user-attachments/assets/d10cdc1a-d66d-4e98-857e-07b3936d4d0c)
 
 
+### 程序睡眠  
 
-
+![image](https://github.com/user-attachments/assets/52d4d4c3-8fef-4dd4-ba0f-87d2133c6a74)
 
 
 
