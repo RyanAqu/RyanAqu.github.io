@@ -45,7 +45,7 @@ tags:
 # 基础算法&数据结构
 [数据结构与基础算法][4]  
 
-# Linux 操作系统  
+# Linux 操作系统基础  
 [Linux 下 Bash 命令基础][2]  
 [Linux 下 g++ 编译基础][3]  
 [Linux 下 gdb 调试][5]  
