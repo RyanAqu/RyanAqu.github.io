@@ -68,6 +68,10 @@ ulimit -a            //查看资源限制
 ulimit -c unlimited  //-c是core选项，在-a之后会展示所有可选选项，unlimited是改的数值，代表无限
 ````
 
+完成以上设置后，当程序“挂掉”后，会产生“尸体”文件，即ls后发现多了core.8277这样类似的core文件，查看命令如下  
+````
+gdb demo core.8277   //gdb+程序+程序的“尸体”
+````
 
 
 
