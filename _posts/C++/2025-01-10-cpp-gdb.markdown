@@ -1,0 +1,45 @@
+---
+layout:     post
+title:      "gdb 调试工具"
+subtitle:   " \"learning……\""
+date:       2025-01-10 14:52:00
+author:     "Ryan"
+header-img: "img/bg-walle.jpg"
+catalog:    true
+tags:
+    - c++
+    - gdb
+---
+
+> 简单和规律确实能带来放松
+
+
+# 安装gdb  
+ubuntu环境下用apt下载，centos只需要把apt替换成yum即可  
+````
+sudo apt update
+sudo apt install gdb
+````
+
+# 编译准备  
+正常编译，不带有gdb调试信息  
+````
+g++ test.cpp -o test
+````
+
+加入gdb调试信息
+````
+g++ -g test.cpp -o test
+````
+
+
+
+
+
+
+
+
+
+
+
+
