@@ -210,7 +210,7 @@ clean:
 .PHONY: clean
 ````
 
-### main函数的参数  
+# main函数的参数  
 main函数一般有三个参数，argc,argv,envp  
 * argc：自动检测输入的参数个数，其中第一个是程序本身的路径
 * argv：自动保存所有输入的参数，后续可以处理
