@@ -33,7 +33,33 @@ time(&now);                   //调用方式2：将time_t变量地质传给time�
 ### localtime库函数  
 ![image](https://github.com/user-attachments/assets/95d4eaad-bfc0-4035-9602-89b6dccb2552)
 
+````
+#include<iostream>
+#include<time.h>
+using namespace std;
 
+int main()
+{
+    time_t now=time(0);
+    cout<<"now="<<now<<endl;
+
+    tm tmnow;
+    localtime_r(&now,&tmnow); // 把整数时间转化为tm结构体
+    string stime = to_string(tmnow.tm_year+1900)+"-"
+                +to_string(tmnow.tm_mon+1)+"-"
+                +to_string(tmnow.tm_mday)+" "
+                +to_string(tmnow.tm_hour)+":"
+                +to_string(tmnow.tm_min)+":"
+                +to_string(tmnow.tm_sec);
+    cout<<"stime="<<stime<<endl;
+    return 0;
+}
+
+````
+
+
+### mktime库函数  
+![image](https://github.com/user-attachments/assets/d10cdc1a-d66d-4e98-857e-07b3936d4d0c)
 
 
 
