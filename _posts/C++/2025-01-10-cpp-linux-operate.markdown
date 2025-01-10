@@ -99,9 +99,11 @@ int main()
 ![image](https://github.com/user-attachments/assets/12f93cb9-f515-471b-aa55-c6b34d53f16a)
 
 ### 创建目录  
+![image](https://github.com/user-attachments/assets/dc3c643c-c519-48ce-bb71-3e4bfc93b861)
 
 
 ### 删除目录  
+![image(https://github.com/user-attachments/assets/cace5e54-6b8e-4d12-9853-10e8ef686858)
 
 
 
