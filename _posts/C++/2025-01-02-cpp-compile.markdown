@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "g++ 编译和库制作"
+title:      "g++ 编译细节和库制作"
 subtitle:   " \"learning……\""
 date:       2025-01-02 17:16:00
 author:     "Ryan"
@@ -9,6 +9,7 @@ catalog:    true
 tags:
     - c++
     - compile
+    - Makefile
 ---
 
 > Hey,亲爱的工作狂先生，新的一年不要对自己太苛刻了～
