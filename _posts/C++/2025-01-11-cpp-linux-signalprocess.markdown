@@ -125,6 +125,141 @@ killall -1 demo
 * 进程暂停与恢复：通过SIGSTOP暂停进程，使用SIGCONT恢复进程。
 * 进程间通信：通过信号实现简单的进程间通信机制。
 
+### 信号的实际应用demo （有保护退出）  
+在实际开发中，服务程序运行在后台，直接kill掉进程不是一个好的策略。因为程序往往占用了比较多的资源，直接kill掉是突然死亡，没有做好善后工作。如果向服务程序发送信号，程序接收到信号之后调用函数，在函数中编写善后的代码，程序就可以有计划的退出。
+
+如果向服务程序发送-0信号，可以检测程序是否存活。
+
+````
+#include<iostream>
+#include<unistd.h>
+#include<signal.h>
+using namespace std;
+
+void EXIT(int signum)
+{
+    cout<<"收到了信号："<<signum<<endl;
+    cout<<"正在释放资源，程序将退出......\n";
+    //保存数据
+    //关闭文件
+    //断开数据库
+    //断开网络连接
+    //etc..
+    cout<<"程序退出。"<<endl;
+    exit(0);
+}
+int main(int argc,char* argv[])
+{
+    for(int i=0;i<=64;i++)
+    {
+        signal(i,SIG_IGN);//忽略全部信号，防止程序被信号异常终止
+    }
+    //如果收到2(ctrl+c)或者15(kill/killall)，主动退出
+    signal(2,EXIT);
+    signal(15,EXIT);
+
+    while(1)
+    {
+        cout<<"执行了一次任务\n";
+        sleep(1);
+    }
+}
+````
+
+# Linux 的进程终止
+进程终止有8种方式，其中5种是正常终止  
+## 5个正常终止  
+### main函数中return
+return 会调用全局和局部的析构，释放资源
+
+
+### 使用exit()库函数  
+exit() 是标准库函数，用于终止当前进程。会执行一定的清理工作，但是不会调用局部的析构函数  
+
+````
+#include <cstdlib>
+
+int main() {
+    // 终止进程，返回 0 表示成功退出，在任意位置都能直接退出
+    std::exit(0);
+}
+
+````
+
+### 使用_exit()  
+_exit() 是更底层的函数，直接终止进程而不清理缓冲区
+
+````
+#include <unistd.h>
+
+int main() {
+    // 立即终止进程
+    _exit(0);
+}
+
+````
+
+### 最后一个线程从其启动例程（线程主函数）用return返回
+这两种暂时不讨论，主要是涉及到线程的使用  
+
+### 最后一个线程中调用pthread_exit()返回
+
+
+## 3个异常终止  
+### 使用 abort()  
+abort() 会使程序异常终止并产生核心转储（core dump），便于调试。
+
+````
+#include <cstdlib>
+
+int main() {
+    // 异常终止
+    std::abort();
+}
+
+````
+
+### 信号捕获终止  
+
+````
+#include <csignal>
+#include <iostream>
+#include <cstdlib>
+
+void signalHandler(int signal) {
+    std::cout << "Received signal: " << signal << ". Cleaning up and exiting." << std::endl;
+    std::exit(0);
+}
+
+int main() {
+    // 捕获 SIGTERM 信号
+    std::signal(SIGTERM, signalHandler);
+
+    std::cout << "Process is running. Send SIGTERM to terminate." << std::endl;
+    while (true) {
+        // 模拟长时间运行
+    }
+
+    return 0;
+}
+````
+
+### 线程对取消请求做响应  
+
+### 总结  
+* 优雅终止：建议使用 exit() 或 kill() 发送 SIGTERM 信号。
+* 强制终止：使用 kill() 发送 SIGKILL 信号或 _exit()。
+* 异常终止：使用 abort()。
+* 信号捕获：结合 signal() 实现资源清理和退出逻辑。
+
+
+
+
+
+
+
+
+
 
 
 
