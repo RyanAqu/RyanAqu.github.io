@@ -182,5 +182,50 @@ int main()
 }
 ````
 
+# 文件或者目录的stat操作  
+c/c++的stat库函数相当于shell的stat命令，可以查看文件或者目录的详细信息  
+````
+#include<iostream>
+#include<cstring>
+#include<unistd.h>
+#include<sys/stat.h>
+#include<stdio.h>
+using namespace std;
+
+int main(int argc,char* argv[])
+{
+    if(argc!=2)
+    {
+        cout<<"Using ./test_stat 文件或者目录名"<<endl;
+        return -1;
+    }
+    struct stat st;
+    if(stat(argv[1],&st)!=0)
+    {
+        cout<<"stat("<<argv[1]<<"):"<<strerror(errno)<<endl; return -1;
+    }
+    if(S_ISREG(st.st_mode))
+    {
+        cout<<"argv[1]"<<"是一个文件("<<"m_time="<<st.st_mtime<<",size="<<st.st_size<<")\n";
+    }
+    if(S_ISDIR(st.st_mode))
+    {
+        cout<<"argv[1]"<<"是一个目录("<<"m_time="<<st.st_mtime<<",size="<<st.st_size<<")\n";
+    }
+
+    return 0;
+}
+````
+
+# utime库函数操作 
+修改文件时间，只有atime和ctime
+
+# rename库函数操作
+相当于操作系统的mv命令  
+
+# remove库函数操作
+相当于操作系统的rm操作
+
+
 
 
