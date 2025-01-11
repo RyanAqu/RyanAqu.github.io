@@ -377,7 +377,7 @@ getppid()       //父进程ID
     * 和 0 号进程一样，也不会终止。
 
 
-### 创建进程  
+### fork()创建进程  
 使用fork()创建进程，fork()之后的内容两个进程（父进程和子进程）都会执行，但是fork()返回值不一样，子进程为0，父进程为进程ID  
 ````
 #include<iostream>
@@ -414,7 +414,79 @@ if (pid == 0) { // 子进程
 注意：  
 * 子进程获得的是父进程的所有拷贝副本，虽然打印变量地址可能相同，但是这只是虚拟地址，真实的物理地址不一样，不像线程    
 * 创建子进程之后，两个进程谁快谁慢是不一定的  
-* for()函数执行一次，但是返回值有两个  
+* for()函数执行一次，但是返回值有两个
+* 父进程和子进程共享一个文件偏移量，即如果打开了一个txt后fork()，fork()后写txt，那么他们写的内容可能会混合（而不是先后覆盖）
+
+### vfork()创建进程    
+vfork() 是 fork() 的一种变体，主要用于优化进程创建的性能，特别是在父进程立即调用 exec 函数时。  
+![image](https://github.com/user-attachments/assets/baebf62d-fb6a-4539-82d5-c79445fc321c)
+
+
+### 僵尸进程  
+进程后台运行的方法有以下方法或者：父进程比子进程更早退出，子进程会被1号程序托管，即变成后台运行    
+````
+./demo &        //命令行运行程序时加&
+````
+
+但是，如果子进程比父进程先退出，而父进程没有处理子进程退出的信息，那么子进程将会变成**僵尸进程**，避免僵尸进程有以下三种方法  
+
+##### 父进程调用 wait() 或 waitpid()  
+* wait()：父进程可以使用 wait() 等待一个子进程的终止，回收其退出状态。
+* waitpid()：类似 wait()，但 waitpid() 更灵活，允许父进程选择等待某个特定的子进程。
+
+````
+#include <iostream>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+int main() {
+    pid_t pid = fork();
+    if (pid == 0) {  // 子进程
+        std::cout << "Child process is running\n";
+        exit(0);  // 子进程退出
+    } else {  // 父进程
+        wait(nullptr);  // 等待子进程退出并回收资源
+        std::cout << "Parent process has collected child status\n";
+    }
+    return 0;
+}
+
+````
+
+##### 使用 signal() 捕捉 SIGCHLD 信号，自动回收子进程  
+父进程可以通过 signal() 捕捉 SIGCHLD 信号，当子进程退出时，父进程可以收到该信号，进而自动调用 wait() 或 waitpid() 来回收子进程的退出状态。这种方法避免了父进程主动调用 wait()，而是通过信号机制自动处理。  
+````
+#include <iostream>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <signal.h>
+
+void sigchld_handler(int signum) {
+    // 等待所有子进程结束并回收资源
+    waitpid(-1, nullptr, WNOHANG);
+}
+
+int main() {
+    signal(SIGCHLD, sigchld_handler);  // 捕捉 SIGCHLD 信号
+    pid_t pid = fork();
+    if (pid == 0) {  // 子进程
+        std::cout << "Child process is running\n";
+        exit(0);  // 子进程退出
+    } else {  // 父进程
+        // 父进程可以继续做自己的事情
+        std::cout << "Parent process is running\n";
+        sleep(5);  // 父进程休眠一段时间
+    }
+    return 0;
+}
+
+````
+
+
+
+
 
 
 
