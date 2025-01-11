@@ -27,7 +27,7 @@ tags:
 Linux中定义了很多信号，每个信号都有一个唯一的编号和名称。常见的信号有：  
 * SIGINT（信号编号2）：由键盘中断（Ctrl+C）触发，默认行为是终止进程。
 * SIGTERM（信号编号15）：终止进程的信号，通常用于正常的进程结束请求，默认行为是终止进程。
-* SIGKILL（信号编号9）：强制终止进程的信号，无法被捕获或忽略。
+* SIGKILL（信号编号9）：**强制**终止进程的信号，无法被捕获或忽略。
 * SIGSEGV（信号编号11）：段错误，通常是由于程序访问无效内存时触发。
 * SIGQUIT（信号编号3）：由键盘退出（Ctrl+\）触发，默认行为是终止进程并生成核心转储。
 * SIGSTOP（信号编号19）：停止进程的信号，无法被捕获、阻塞或忽略。
@@ -48,6 +48,52 @@ Linux中定义了很多信号，每个信号都有一个唯一的编号和名称
 * 默认处理：每个信号都有默认的处理行为，进程可以选择忽略它（例如，SIGKILL），或者执行特定操作（如终止进程、生成核心转储等）。
 * 自定义处理：通过信号处理函数（signal handler），进程可以自定义信号的处理行为。
 * 忽略信号：进程可以选择忽略特定的信号（除SIGKILL和SIGSTOP外，其他信号都可以被忽略）。
+
+以下代码定义了三种信号处理方式：  
+````
+#include<iostream>
+#include<unistd.h>
+#include<signal.h>
+using namespace std;
+
+void signal_handler(int signum)//自定义处理方式
+{
+    cout<<"收到了信号:"<<signum<<endl;
+    signal(signum,SIG_DFL);//SIG_DFL宏将信号处理方法恢复为默认，所以第二次不会进入这个程序了
+}
+void bb(const int bc,const string bcn)
+{
+    for(int i=0;i<1000000;++i)
+    {
+        sleep(1);
+        cout<<"i="<<i<<endl;
+    }
+}
+void aa(const int no,const string name)
+{
+    bb(3,"skylar");
+}
+int main()
+{
+    signal(1, signal_handler);//回调的方法
+    signal(15, signal_handler);//收到了1或者15的信号，则执行自定义的信号处理函数
+    signal(2,SIG_IGN);//忽略信号2
+    
+    aa(8,"dylann");
+    return 0;
+}
+````
+
+使用以下命令对进程发送信号：
+````
+kill <pidof demo>
+killall demo
+
+killall -2 demo
+killall -15 demo
+killall -1 demo
+````
+2号信号会被忽略，15信号会被自定义处理函数输出，函数内将处理方法改回了默认处理方式，1信号进入后进程被终止。
 
 ### 信号的阻塞与解阻  
 进程可以选择阻塞某些信号，阻塞的信号不会立即被处理，直到它们被解阻。例如，sigprocmask()函数可以用来阻塞或解除阻塞特定信号。
