@@ -183,8 +183,13 @@ int main() {
     // 终止进程，返回 0 表示成功退出，在任意位置都能直接退出
     std::exit(0);
 }
-
 ````
+
+exit可以使用atexit()函数登记终止时的自定义操作函数（最多32个），这些函数将由exit()自动调用，调用与登记顺序相反。这种方式可以在使用exit()函数的方式退出时实现清理工作  
+````
+atexit(func1);    //登记
+````
+
 
 ### 使用_exit()  
 _exit() 是更底层的函数，直接终止进程而不清理缓冲区
@@ -254,9 +259,137 @@ int main() {
 
 
 
+# Linux 下C++程序调用其他程序  
+Linux提供了system()函数和exec函数族，在C++程序中可以执行其他程序，包括二进制文件、操作系统命令或者shell脚本  
+
+### system()函数  
+在 C 和 C++ 中，system() 函数用于调用操作系统的命令解释器（shell）来执行一条命令或程序。它是标准库的一部分，定义在 <cstdlib> 或 <stdlib.h> 头文件中。 
+
+system()执行后流程会回来  
+````
+#include <iostream>
+#include <cstdlib>
+
+int main() {
+    int result = system("ls");
+    std::cout << "Command exited with status: " << result << std::endl;
+    return 0;
+}
+````
+
+### exec()函数族  
+exec() 函数族是 Unix/Linux 系统中用于替换当前进程镜像的一组函数。调用这些函数后，当前进程将被新程序取代，不会再回到调用的程序继续执行。因此，这些函数通常与 fork() 结合使用，用来实现进程的创建和替换。
+![image](https://github.com/user-attachments/assets/dd030037-de95-4b59-a226-cd81055d2303)
+
+##### execl()函数  
+新进程的进程编号原进程相同，但是新进程取代了原进程代码段、数据段和堆栈  
+````
+#include <unistd.h>
+#include <iostream>
+
+int main() {
+    // 替换当前进程为 `ls`，并传递参数
+    execl("/bin/ls", "ls", "-l", "-a", nullptr);
+
+    // 如果执行成功，上面代码后面的内容不会执行
+    std::cerr << "Execution failed!" << std::endl;
+    return 1;
+}
+````
+
+##### execlp()函数  
+支持搜索 PATH 环境变量，不需要提供全路径。  
+````
+#include <unistd.h>
+#include <iostream>
+
+int main() {
+    // 使用 PATH 搜索 `ls` 命令
+    execlp("ls", "ls", "-l", "-a", nullptr);
+
+    std::cerr << "Execution failed!" << std::endl;
+    return 1;
+}
+
+````
+
+##### execlv()函数  
+参数通过数组传递。  
+````
+#include <unistd.h>
+#include <iostream>
+
+int main() {
+    char *args[] = { (char *)"ls", (char *)"-l", (char *)"-a", nullptr };
+    execv("/bin/ls", args);
+
+    std::cerr << "Execution failed!" << std::endl;
+    return 1;
+}
+
+````
 
 
+##### 子进程法  
+非进程转换的使用方法：  
+````
+pid_t pid = fork();
+if (pid == 0) { // 子进程
+    execlp("ls", "ls", "-l", nullptr);
+} else if (pid > 0) { // 父进程
+    wait(nullptr); // 等待子进程完成
+}
+````
 
+
+# Linux 进程基础  
+查看进程树  
+````
+pstree -p 0        //查看0号进程树
+pstree -p          //默认查看1号进程树
+````
+
+库函数查看进程ID  
+````
+getpid()        //当前进程ID
+getppid()       //父进程ID
+````
+
+### 3个特殊进程  
+##### 0号进程（swapper 或 idle 进程）  
+* 功能  
+    * 这是操作系统启动时创建的第一个进程，通常被称为 "idle process"（空闲进程）。
+    * 它在没有其他任务运行时会执行，以保持 CPU 忙碌。
+    * 主要用于 CPU 的资源管理，例如进入低功耗状态（C-state）。
+* 特点
+    * PID 为 0，是操作系统的核心部分。
+    * 在现代 Linux 系统中，这部分功能通常是内核线程的一部分。
+    * 永远不会被终止。
+
+##### 1号进程（init 或 systemd）  
+* 功能  
+    * 是第一个用户态（user space）进程，由 0 号进程（内核）通过 fork() 和 exec() 创建.
+    * 它是所有其他用户进程的祖先，并负责启动和管理系统中的其他服务和进程。
+* 特点
+    * PID 为 1。
+    * 如果一个进程的父进程退出，其子进程会被 PID 1 的进程接管（即成为孤儿进程时由 init 或 systemd 管理）。
+    * 在系统运行期间，PID 1 的进程非常重要，一旦它崩溃，系统通常会挂起或崩溃。
+
+##### 2号进程（kthreadd）
+* 功能  
+    * 是内核线程管理器，负责管理和调度所有内核线程。
+    * kthreadd 自身也是由 PID 0 的内核进程通过 fork() 创建的。
+    * 内核中的许多后台线程都由 kthreadd 派生，例如：
+        * kworker/*：处理内核任务队列。
+        * ksoftirqd/*：处理软中断。
+        * kswapd：负责内存换页操作。
+* 特点
+    * PID 为 2。
+    * 运行在内核态，用户态进程无法直接与其交互。
+    * 和 0 号进程一样，也不会终止。
+
+
+### 创建进程  
 
 
 
