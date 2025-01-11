@@ -259,7 +259,7 @@ int main() {
 
 
 
-# Linux 下C++程序调用其他程序  
+# Linux 下C++程序调用其他程序（进程前置知识）  
 Linux提供了system()函数和exec函数族，在C++程序中可以执行其他程序，包括二进制文件、操作系统命令或者shell脚本  
 
 ### system()函数  
@@ -330,18 +330,6 @@ int main() {
 ````
 
 
-##### 子进程法  
-非进程转换的使用方法：  
-````
-pid_t pid = fork();
-if (pid == 0) { // 子进程
-    execlp("ls", "ls", "-l", nullptr);
-} else if (pid > 0) { // 父进程
-    wait(nullptr); // 等待子进程完成
-}
-````
-
-
 # Linux 进程基础  
 查看进程树  
 ````
@@ -390,10 +378,38 @@ getppid()       //父进程ID
 
 
 ### 创建进程  
+使用fork()创建进程，fork()之后的内容两个进程（父进程和子进程）都会执行，但是fork()返回值不一样，子进程为0，父进程为进程ID  
+````
+#include<iostream>
+#include<unistd.h>
+using namespace std;
+
+int main()
+{
+    cout<<"开始fork：\n";
+    pid_t pid=fork();
+    cout<<"pid="<<pid<<endl;
+    return 0;
+}
+````
+
+输出结果为:  
+````
+开始fork：
+pid=0
+pid=32688
+````
 
 
-
-
+可以用返回值判断当前进程为父还是子进程（这里用exec函数族将子进程替换成了另一个进程），切记父进程要wait()，否则子进程容易变成僵尸进程
+````
+pid_t pid = fork();
+if (pid == 0) { // 子进程
+    execlp("ls", "ls", "-l", nullptr);
+} else if (pid > 0) { // 父进程
+    wait(nullptr); // 等待子进程完成
+}
+````
 
 
 
