@@ -141,9 +141,46 @@ int main(int argc,char * argv[])
 }
 ````
 
+# Linux中的错误信息  
+在<ctring>头文件中有133个错误类型，通过strerror函数可以显示出来  
+````
+#include<iostream>
+#include<cstring>
+using namespace std;
 
+int main()
+{
+    //<cstring>只有133个错误代码
+    for(int i=0;i<150;i++)
+    {
+        cout<<i<<":"<<strerror(i)<<endl;
+    }
+    return 0;
+}
+````
 
+关于errno的使用，只有系统调用出错才会设置errno  
+````
+#include<iostream>
+#include<cstring>
+#include<cerrno>
+#include<sys/stat.h>
+using namespace std;
 
+int main()
+{
+    int iret=mkdir("/temp",0755);//目录权限 
+    
+    if(iret!=0)
+    {
+        cout<<"iret="<<iret<<endl;
+        cout<<errno<<":"<<strerror(errno)<<endl;
+        perror("调用功能失败");
+    }
+    
+    return 0;
+}
+````
 
 
 
