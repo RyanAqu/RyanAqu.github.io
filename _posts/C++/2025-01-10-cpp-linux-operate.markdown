@@ -224,7 +224,7 @@ int main(int argc,char* argv[])
 相当于操作系统的mv命令  
 
 # remove库函数操作
-相当于操作系统的rm操作
+相当于操作系统的rm命令
 
 
 
