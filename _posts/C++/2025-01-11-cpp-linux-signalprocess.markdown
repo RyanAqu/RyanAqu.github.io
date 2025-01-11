@@ -60,7 +60,11 @@ kill -l
 #include<unistd.h>
 #include<signal.h>
 using namespace std;
-
+void alarm_handler(int signum)
+{
+    cout<<"闹钟响了"<<endl;
+    alarm(5);
+}
 void signal_handler(int signum)//自定义处理方式
 {
     cout<<"收到了信号:"<<signum<<endl;
@@ -83,8 +87,12 @@ int main()
     signal(1, signal_handler);//回调的方法
     signal(15, signal_handler);//收到了1或者15的信号，则执行自定义的信号处理函数
     signal(2,SIG_IGN);//忽略信号2
-    
+
+    alarm(5);//闹钟定时器，只执行一次，在倒数5s后发送-14信号终止程序
+    signal(14,alarm_handler);//自定义函数处理-14信号
+
     aa(8,"dylann");
+
     return 0;
 }
 ````
