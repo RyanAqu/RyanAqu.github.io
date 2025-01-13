@@ -607,6 +607,94 @@ int main(int argc, char*argv[])
 ipcs -m
 ````
 
+### 共享内存的使用  
+为了使用创建好的共享内存，需要使用shmat函数把共享内存连接到当前进程的地址空间。  
+然后使用指针进行直接使用。  
+使用后如果短时间内不再使用，就断开连接，释放资源。  
+如果共享内存不再需要，就对其进行删除。  
+
+````
+#include<iostream>
+#include<unistd.h>
+#include<signal.h>
+#include<sys/shm.h>
+#include<cstring>
+using namespace std;
+
+//本程序创建了一块共享内存,链接并且使用
+struct stgirl
+{
+    int no;
+    char name[51];//注意不能用string
+};
+
+int main(int argc, char*argv[])
+{
+    if(argc!=3)
+    {
+        cout<<"Using ./test_sharedmemory age(int) name(string)\n";
+        return -1;
+    }
+    //第1步，创建/获取共享内存，键值key为0x5005,也可以用其他值
+    int shmid=shmget(0x5005,sizeof(stgirl),0640|IPC_CREAT);
+    if(shmid==-1)
+    {
+        cout<<"shmget(0x5005) failed.\n";
+        return -1;
+    }
+    cout<<"shmid="<<shmid<<endl;
+
+    //第2步，把共享内存连接到当前进程的地址空间
+    stgirl * ptr = (stgirl * )shmat(shmid,0,0);
+    if(ptr==(void*)-1)
+    {
+        cout<<"shmat failed\n";
+        return -1;
+    }
+
+    //第3步，使用共享内存，对内存进行读/写
+    cout<<"原值：no="<<ptr->no<<".name="<<ptr->name<<endl;
+    ptr->no=atoi(argv[1]);
+    strcpy(ptr->name,argv[2]);
+    cout<<"新值：no="<<ptr->no<<".name="<<ptr->name<<endl;
+  
+    //第4步，把共享内存从当前进程中分离
+    shmdt(ptr);
+
+    //第5步，如果共享内存不再使用，使用以下代码删除
+    if(shmctl(shmid,IPC_RMID,0)==-1)
+    {
+        cout<<"shmctl failed\n";
+        return -1;
+    }
+
+    return 0;
+}
+
+````
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
