@@ -604,7 +604,8 @@ int main(int argc, char*argv[])
 
 用以下命令查看共享内存  
 ````
-ipcs -m
+ipcs -m        //查看共享内存
+ipcrm -m 共享内存ID //手动删除共享内存
 ````
 
 ### 共享内存的使用  
@@ -673,21 +674,270 @@ int main(int argc, char*argv[])
 
 ````
 
+注意：  
+* 共享内存不能自动扩展，只能使用C++内置的数据类型  
+* 共享内存不能使用STL容器，也不能使用移动语义  
+* 共享内存在使用时，前一个共享内存一定要删掉？
+
+
+# 信号量  
+信号量（Semaphore）是一种用于控制对共享资源的访问的同步工具，广泛应用于多进程和多线程的编程中。信号量由一个计数器、一个进程或线程队列以及一组操作组成。信号量可以帮助我们在并发环境中控制资源的访问，避免数据竞态、死锁等问题。 
+
+### 信号量的基本原理和核心操作  
+信号量通过维护一个整数值来管理对共享资源的访问：  
+* 当信号量的值大于 0 时，进程/线程可以访问共享资源。  
+* 当信号量的值为 0 时，进程/线程需要等待，直到其他进程/线程释放资源，信号量的值增加，才可以访问共享资源。  
+
+信号量的核心操作包括：  
+* P 操作（等待操作，或称为减操作）：将信号量的值减 1。如果信号量的值为 0，进程/线程会被阻塞，直到信号量值大于 0。  
+* V 操作（释放操作，或称为加操作）：将信号量的值加 1。如果有进程/线程因为信号量值为 0 被阻塞，V 操作会唤醒一个等待的进程/线程。  
+
+### 信号量的应用场景  
+* 互斥：使用二值信号量来确保某些共享资源在同一时刻只能被一个进程/线程访问。信号量值为 1 表示资源可用，值为 0 表示资源已被占用。  
+* 进程/线程同步：信号量用于协调多个进程或线程的执行顺序。例如，线程 A 完成某项任务后，线程 B 才能开始执行。  
+* 资源管理：例如，线程池、数据库连接池等，其中信号量的值表示可用资源的数量，进程/线程在访问这些资源时需要通过信号量来同步。  
+
+
+### 信号量类创建以及使用  
+````
+#include<iostream>
+#include<unistd.h>
+#include<signal.h>
+#include<sys/shm.h>
+#include<sys/sem.h>
+#include<cstring>
+using namespace std;
+
+//本程序创建了一块共享内存,链接并且使用，并创建了一个信号量互斥锁
+
+// 信号量类
+class csemp
+{
+    private:
+        union semun // 用于信号量操作的共同体
+        {
+            int val;
+            struct semid_ds *buf;
+            unsigned short *arry;
+        };
+        
+        int m_semid; // 信号量id（描述符）
+        
+        /*
+        如果把sem _flg设置为SEM_UNDO，操作系统将跟踪进程对信号量的修改情况，
+        在全部修改过信号量的进程（正常或异常）终止后，操作系统将把信号量恢
+        复为初始值（就像撤消了全部进程对信号的操作)。
+        如果信号量用于互斥锁，设置为SEM_UNDO。
+        如果信号量用于生产消费者模型，设置为0。
+        */
+        short m_sem_flg;
+        
+        csemp(const csemp &) = delete; // 禁用拷贝构造函数
+        csemp &operator = (const csemp &) = delete; // 禁用赋值函数
+        
+    public:
+        csemp(): m_semid(-1) {} // 构造函数，初始化信号量的id为-1，表示信号量没有被初始化，已经初始化了id >= 0。
+        /*
+        如果信号量已存在，获取信号量;如果信号量不存在，则创建它并初始化为
+        valueo如果用于互斥锁，value填1，sem_flg填SEM_UNDO。
+        如果用于生产消费者模型，value填0，sem_flg填0。
+        */
+        bool init(key_t key, unsigned short value = 1, short sem_flg = SEM_UNDO);
+        bool wait(short sem_op = -1); // 信号量的P操作
+        bool post(short sem_op = 1); // 信号量的V操作
+        int getvalue(); // 获取信号量的值，成功返回信号量的值，失败返回-1
+        bool destroy(); // 销毁信号量
+        ~csemp();      
+};
+
+// 信号量的一些函数
+bool csemp::init(key_t key, unsigned short value, short sem_flg)
+{
+    if(m_semid != -1) // 如果初始化了，则不必再初始化
+        return false;
+    m_sem_flg = sem_flg;
+    /*
+    信号量的初始化不能直接用semget(key,1,0666|IPC_CREAT)
+    因为信号量创建后，初始值是0，如果用于互斥锁，需要把它的初始值设置为1，
+    而获取信号量则不需要设置初始值，所以，创建信号量和获取信号量的流程不同。
+    信号量的初始化分三个步骤:
+    1)获取信号量，如果成功，函数返回。
+    2)如果失败，则创建信号量。
+    3)设置信号量的初始值。
+    */
+    
+    //获取信号量
+    if((m_semid = semget(key, 1, 0666)) == -1)
+    {
+        if(errno == ENOENT) // 如果信号量不存在
+        {
+            if((m_semid = semget(key, 1, 0666 | IPC_CREAT | IPC_EXCL)) == -1) // 用IPC_EXCL标志确保只有一个进程创建
+                                                                              // 并初始化信号量，其他进程只能获取。
+            {
+                if(errno == EEXIST) // 如果错误代码是信号量已存在，则再次获取
+                {
+                    if((m_semid = semget(key, 1, 0666)) == -1) // 再次获取信号量
+                    {
+                        perror("init 1 semget()");
+                        return false;
+                    }
+                    return true;
+                }
+                else
+                {
+                    perror("init 2semget()");
+                    return false;
+                }
+            }
+            // 运行下面几行说明，信号量创建成功，需要初始化成value
+            union semun sem_union;
+            sem_union.val = value;
+            if(semctl(m_semid, 0, SETVAL, sem_union) < 0)
+            {
+                perror("init semctl()");
+                return false;
+            }
+        }
+        else
+        {
+            perror("init 3 semget()");
+            return false;
+        }
+    }
+    return true;
+}
+
+// 信号量的P操作，wait函数（把信号量的值加value），如果信号量的值为0，将阻塞等待，直到信号量的值大于0.
+bool csemp::wait(short value)
+{
+    if(m_semid == -1)
+        return false;
+    
+    struct sembuf sem_b;
+    sem_b.sem_num = 0; // 信号量的编号，0代表第一个信号量
+    sem_b.sem_op = value; // P操作的value 必须小于0
+    sem_b.sem_flg = m_sem_flg;
+    if(semop(m_semid, &sem_b, 1) == -1)
+    {
+        perror("P semop()");
+        return false;
+    }
+    return true;
+}
+
+// 信号量的V操作（把信号量的值加value）
+bool csemp::post(short value)
+{
+    if(m_semid == -1)
+        return false;
+    
+    struct sembuf sem_b;
+    sem_b.sem_num = 0; // 信号量的编号，0代表第一个信号量
+    sem_b.sem_op = value; // V操作的value 必须大于0
+    sem_b.sem_flg = m_sem_flg;
+    if(semop(m_semid, &sem_b, 1) == -1)
+    {
+        perror("V semop()");
+        return false;
+    }
+    return true;
+}
+
+// 获取信号量的值，成功返回值，否则返回-1
+int csemp::getvalue()
+{
+    return semctl(m_semid, 0, GETVAL);
+}
+
+// 销毁信号量
+bool csemp::destroy()
+{
+    if(m_semid == -1)
+        return false;
+    if(semctl(m_semid, 0, IPC_RMID) == -1)
+    {
+        perror("destroy semctl()");
+        return false;
+    }
+    return true;
+}
 
 
 
+struct stgirl
+{
+    int no;
+    char name[51];//注意不能用string
+};
+
+int main(int argc, char*argv[])
+{
+    if(argc!=3)
+    {
+        cout<<"Using ./test_sharedmemory age(int) name(string)\n";
+        return -1;
+    }
+    //第1步，创建/获取共享内存，键值key为0x5005,也可以用其他值
+    int shmid=shmget(0x5005,sizeof(stgirl),0640|IPC_CREAT);
+    if(shmid==-1)
+    {
+        cout<<"shmget(0x5005) failed.\n";
+        return -1;
+    }
+    cout<<"shmid="<<shmid<<endl;
+
+    //第2步，把共享内存连接到当前进程的地址空间
+    stgirl * ptr = (stgirl * )shmat(shmid,0,0);
+    if(ptr==(void*)-1)
+    {
+        cout<<"shmat failed\n";
+        return -1;
+    }
+
+    //创建、初始化二元信号量(mutex),加锁
+    csemp mt;
+    if(mt.init(0x5005)==false)
+    {
+        cout<<"mt.init(0x5005) failed.\n";
+        return -1;
+    }
+    cout<<"申请加锁...\n";
+    mt.wait();
+    cout<<"加锁成功.\n";
 
 
+    //第3步，使用共享内存，对内存进行读/写
+    cout<<"原值：no="<<ptr->no<<".name="<<ptr->name<<endl;
+    ptr->no=atoi(argv[1]);
+    strcpy(ptr->name,argv[2]);
+    cout<<"新值：no="<<ptr->no<<".name="<<ptr->name<<endl;
+    sleep(10);
+
+    //解锁
+    mt.post();
+    cout<<"解锁。\n";
 
 
+    //第4步，把共享内存从当前进程中分离
+    shmdt(ptr);
 
+    //第5步，如果共享内存不再使用，使用以下代码删除
+    //if(shmctl(shmid,IPC_RMID,0)==-1)
+    //{
+    //    cout<<"shmctl failed\n";
+    //    return -1;
+    //}
 
+    return 0;
+}
 
+````
 
-
-
-
-
+以下命令查看和操作信号量  
+````
+ipcs -s        //查看信号量数组
+ipcrm sem 信号量ID    //手动删除信号量数组
+````
 
 
 
