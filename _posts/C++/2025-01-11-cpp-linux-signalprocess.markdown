@@ -488,6 +488,129 @@ int main() {
 孤儿进程回收，不常用  
 
 
+# 多进程与信号  
+在Linux中，可以用命令kill或者killall杀死进程，在程序中，可以用kill()函数来实现信号发送：int kill(pid_t pid,int signum);  
+pid：目标进程的进程 ID（PID）。如果 pid 是负数，表示发送信号给指定组中的所有进程；如果 pid 为 0，表示发送信号给当前进程的所有同一进程组的进程；如果 pid 为 -1，则发送信号给所有进程（除了进程 1 和当前进程）。pid 也可以是特定的进程 ID。  
+**应用：** 在多进程服务程序中，如果子进程收到退出信号，子进程自行退出；如果父进程收到信号，应该向所有子进程发送退出信号，然后自己再退出。  
+
+以下代码父进程每10秒创建一个子进程，子进程每三秒打印输出进程号正在运行，使用ps -ef|grep demo查看所有父子进程，使用kill+子进程号可以杀死子进程，使用kill+父进程号可以杀死所有父子进程  
+````
+#include<iostream>
+#include<unistd.h>
+#include<signal.h>
+using namespace std;
+
+void FathExit(int signum)
+{
+    //防止信号处理过程中再次被中断，以进行有效的不被打断的退出
+    signal(SIGINT,SIG_IGN);
+    signal(SIGTERM,SIG_IGN);
+
+    cout<<"父进程退出，sig="<<signum<<endl;
+    kill(0,SIGTERM);//kill所有子进程
+
+    //释放资源
+    exit(0);
+}
+
+void ChildEXIT(int signum)
+{
+    //防止信号处理过程中再次被中断
+    signal(SIGINT,SIG_IGN);
+    signal(SIGTERM,SIG_IGN);
+
+    cout<<"子进程"<<getpid()<<"退出，sig="<<signum<<endl;
+    //释放子进程资源
+    exit(0);
+}
+
+int main()
+{
+    for(int i=1;i<=64;++i)
+    {
+        signal(i,SIG_IGN);
+    }
+    signal(SIGTERM,FathExit);//15
+    signal(SIGINT,FathExit);//2
+
+    while(1)
+    {
+        if(fork()>0)
+        {
+            sleep(10);continue;//每10秒生成一个子进程
+
+        }
+        else
+        {
+            signal(SIGTERM,ChildEXIT);
+            signal(SIGINT,SIG_IGN);
+            while(1)
+            {
+                cout<<"子进程"<<getpid()<<"正在运行中。\n";
+                sleep(3);
+                continue;
+            }
+        }
+    }
+
+    return 0;
+}
+````
+
+
+# 共享内存  
+在多进程和多线程的编程中，共享内存是一个重要的概念。它使得多个进程或线程能够访问和修改同一块内存区域。不同的是，多进程和多线程在共享内存时的方式和机制有所不同。
+
+### 进程间通信和共享内存  
+进程间通信（IPC）：每个进程在操作系统中都运行在独立的地址空间内，它们通常不能直接访问彼此的内存。为了解决这个问题，操作系统提供了进程间通信（IPC）机制，允许不同进程之间进行数据交换。常见的 IPC 机制包括： 
+
+* 管道（pipe）
+* 消息队列（message queue）
+* 信号量（semaphore）
+* 套接字（socket）
+* 共享内存（shared memory）
+
+共享内存是一种效率较高的进程间通信方式，多个进程（不需要派生关系）可以直接访问同一块物理内存。这通常通过操作系统提供的共享内存区域实现。在共享内存的实现中，多个进程需要通过一些同步机制（如信号量、互斥锁等）来避免数据冲突。
+
+### 共享内存的创建  
+````
+#include<iostream>
+#include<unistd.h>
+#include<signal.h>
+#include<sys/shm.h>
+using namespace std;
+
+//本程序创建了一块共享内存
+struct stgirl
+{
+    int no;
+    char name[51];//注意不能用string
+};
+
+int main(int argc, char*argv[])
+{
+    //第1步，创建/获取共享内存，键值key为0x5005,也可以用其他值
+    int shmid=shmget(0x5005,sizeof(stgirl),0640|IPC_CREAT);
+    if(shmid==-1)
+    {
+        cout<<"shmget(0x5005) failed.\n";
+        return -1;
+    }
+    cout<<"shmid="<<shmid<<endl;
+    return 0;
+}
+
+````
+
+用以下命令查看共享内存  
+````
+ipcs -m
+````
+
+
+
+
+
 
 
 
