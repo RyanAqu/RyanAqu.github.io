@@ -1,0 +1,146 @@
+---
+layout:     post
+title:      "操作系统"
+subtitle:   " \"learning……\""
+date:       2025-01-13 19:42:00
+author:     "Ryan"
+header-img: "img/bg-walle.jpg"
+catalog:    true
+tags:
+    - c++
+    - OS
+---
+
+> 风花雪月本闲，而扰攘者自冗.....
+
+
+**纯理论八股复习**
+
+# 操作系统绪论  
+### 操作系统分类  
+* 分时操作系统
+* 实时操作系统
+  * 硬实时：导弹、通信
+  * 软实时：订票
+
+### 操作系统运行机制  
+CPU上运行两种程序：区分内核程序（操作系统kernel开发）和应用程序（应用开发）  
+
+![image](https://github.com/user-attachments/assets/c70956cb-5931-46d0-8b41-64e3bc38aa97)
+
+1. 刚开机时，CPU为内核态，操作系统内核程序先上CPU运行  
+2. 开机完成后，用户可以启动某个应用程序  
+3. 操作系统在合适的时候主动让出CPU，让该程序上CPU运行
+4. 应用程序运行在用户态
+5. 用户态程序非法事件会导致中断产生
+
+![image](https://github.com/user-attachments/assets/a2c285b8-3895-4615-8e44-2e5f5a786430)
+
+
+### 中断和异常  
+中断是操作系统夺回使用权的唯一途径，会让用户态切回内核态  
+
+中断分类：
+* 内中断：CPU执行某些指令时，发现非法行为（或者错误）产生，就会产生内中断；或者有用户态的“陷入指令”要求系统调用
+  * 陷入trap（系统调用）
+  * 故障fault
+  * 终止abort（程序挂掉，可以吐核）
+* 外中断：
+  * 时钟中断（alarm定时）
+  * I/O中断  
+
+中断屏蔽->中断请求->中断管理器->中断向量表->中断处理函数
+
+### 系统调用  
+系统调用是在内核态执行的，相当于软中断
+
+常见的 Linux 系统调用分类：
+* 进程管理：用于创建、管理和终止进程。#include<unistd.h>。
+  * fork()：创建一个子进程。
+  * exec()：执行程序，替换当前进程的镜像。exec函数族。
+  * exit()：终止当前进程。
+  * wait()：等待子进程终止。
+  * waitpid()：等待指定子进程终止。
+  * getpid()：获取进程的 PID。
+  * getppid()：获取父进程的 PID。
+  * kill()：发送信号给进程。
+* 文件操作：用于文件和目录的创建、删除、读取、写入等操作。
+  * open()：打开文件或设备。
+  * read()：从文件读取数据。
+  * write()：将数据写入文件。
+  * close()：关闭文件。
+  * stat()：获取文件的状态信息。
+  * unlink()：删除文件。
+  * mkdir()：创建目录。
+* 内存管理：用于动态分配和管理内存。
+  * mmap()：映射文件或设备到内存。
+  * munmap()：解除内存映射。
+  * brk()：调整进程的堆内存。
+  * sbrk()：增长或减少数据段的大小。
+* 设备控制： 用于与设备交互的系统调用。
+  * ioctl()：控制设备的操作。
+  * read()：从设备读取数据。
+  * write()：向设备写入数据。
+* 信号处理： 用于处理进程间的信号通信。
+  * signal()：设置信号处理函数。
+  * kill()：向进程发送信号。
+  * pause()：使进程挂起，等待信号。
+  * sigaction()：设置信号处理方式。
+* 进程间通信： 用于在不同进程之间交换数据。
+  * pipe()：创建管道。
+  * shmget()：创建共享内存段。
+  * mqueue()：消息队列。
+  * msgget()：获取消息队列。
+* 网络通信： 用于套接字和网络协议的操作。
+  * socket()：创建网络套接字。
+  * bind()：将套接字与地址绑定。
+  * connect()：连接到远程服务器。
+  * send()：发送数据。
+  * recv()：接收数据。
+
+### 操作系统内核  
+![image](https://github.com/user-attachments/assets/375fb253-2e74-4e4f-8d4d-793e3d7ec451)
+
+![image](https://github.com/user-attachments/assets/e3b39ed3-8e3e-491f-a78b-f1abf0489c56)
+
+### 操作系统引导  
+Linux操作系统引导  
+1. BIOS/UEFI 启动：硬件初始化，加载引导程序。
+2. 引导加载程序（GRUB 或其他）：选择并加载操作系统内核。
+3. 内核初始化：加载设备驱动，挂载根文件系统，初始化系统。
+4. 用户空间启动：启动 init 或 systemd 进程，进入多用户模式。
+
+### 虚拟机  
+
+![image](https://github.com/user-attachments/assets/16ef7052-0f5c-48f9-bcf0-6a47152651dc)
+
+![image](https://github.com/user-attachments/assets/7bdca676-5129-4cc9-ad48-2d11f327864d)
+
+# 进程  
+进程的组成
+* 进程控制块 -- PCB
+* 程序段
+* 数据段
+
+同一个程序可以产生多个进程，譬如QQ程序可以开多个窗口，登陆多个QQ，进程是程序的一次执行过程  
+每个进程都有唯一的PID，是由操作系统动态分配的  
+
+查看进程的命令  
+````
+ps -ef        //显示所有进程的详细信息，包括 PID、父进程 PID、用户、CPU 时间、启动时间等。
+ps -ef | grep process_name  //查找进程
+top
+````
+
+![image](https://github.com/user-attachments/assets/f1438bae-ea4b-458a-8f65-8de70b7247e1)
+
+### 进程的状态与转换  
+
+
+
+
+
+
+
+
+
