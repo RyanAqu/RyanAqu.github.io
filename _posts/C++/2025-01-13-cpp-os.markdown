@@ -134,7 +134,139 @@ top
 
 ![image](https://github.com/user-attachments/assets/f1438bae-ea4b-458a-8f65-8de70b7247e1)
 
-### 进程的状态与转换  
+### 进程的状态与转换    
+创建态->就绪态->运行态(CPU调度之后进入运行)->结束态  
+进程可以主动进入阻塞态  
+````
+    +---------+        +---------+
+    |创建(New)| -----> |就绪(Ready)|
+    +---------+        +---------+
+                          |  ^
+      调度器分配CPU       |  |   时间片用尽
+                          v  |
+                     +---------+      等待完成
+                     | 运行(Run)|  -------------------> +---------+
+                     +---------+                        |等待(Wait)|
+                         |                              +---------+
+                         v
+                     +---------+
+                     |终止(Term)|
+                     +---------+
+
+````
+
+![image](https://github.com/user-attachments/assets/ad971ae8-766c-43a1-a072-6657af3ee91f)
+
+![image](https://github.com/user-attachments/assets/cbfc39b8-8ca2-4083-a0c4-9f728ce45179)
+
+![image](https://github.com/user-attachments/assets/76c4ad67-3067-4082-b25a-199279980b9d)
+
+### 进程控制  
+进程控制（状态转换）要一气呵成，不能被中断，所以要利用原语实现。  
+原语具有原子性，是原子操作，原语是指操作系统提供的一些低级别、不可分割的基本操作，用于实现对共享资源的同步与保护。原语通常由内核实现，保证其在执行过程中不会被中断，从而确保并发环境中的操作原子性。  
+PCB可以自动保存程序运行上下文，也就可以在程序下CPU之后重新运行时还原进程运行环境。  
+
+1. 进程创建
+    * 创建新的进程并分配资源。
+    * 典型原语：fork()
+2. 进程执行
+    * 替换当前进程的代码和数据，执行新的程序。
+    * 典型原语：exec()函数族
+3. 进程终止  
+    * 终止进程的执行，释放资源。
+    * 典型原语：exit() kill() _exit()
+4. 进程等待
+    * 等待子进程状态变化（完成、被杀死等）。
+    * 典型原语：wait() waitpid()
+5. 进程阻塞
+    * 将进程状态从运行态切换为阻塞态，等待某条件满足。
+    * 典型原语：sleep() pause()
+6. 进程唤醒
+    * 将进程从阻塞态切换回就绪态。
+    * 典型原语：信号机制 kill(pid, signal)：向进程发送信号唤醒。
+7. 进程通信
+    * 用于多个进程之间的交互与信息共享。
+    * 典型原语：
+        * 管道：pipe()，实现单向数据传输。
+        * 共享内存：shmget(), shmat(), shmdt()。
+        * 消息队列：msgget(), msgsnd(), msgrcv()。
+        * 信号量：semget(), semop()。
+8. 优先级调整
+    * 调整进程的优先级以改变调度顺序。
+    * 典型原语：nice() setpriority()
+9. 进程组与会话
+    * 管理多个进程的集合。
+    * 典型原语：
+        * getpid()：获取当前进程 ID。
+        * getppid()：获取父进程 ID。
+        * getpgrp() 和 setpgrp()：获取或设置进程组。
+        * setsid()：创建新会话。
+
+### 进程间通信 IPC  
+进程间通信（Inter-Process Communication, IPC）提供了多种机制，用于在不同进程之间传递数据、状态或同步操作。  
+管道：pipe()，实现单向数据传输。共享内存：shmget(), shmat(), shmdt()。消息队列：msgget(), msgsnd(), msgrcv()。信号量：semget(), semop()。  
+
+![image](https://github.com/user-attachments/assets/01f7a103-5864-43e3-9722-f1863251e3ad)  
+
+![image](https://github.com/user-attachments/assets/cc7d5400-319d-444b-8bee-303b30c74530)
+
+
+消息队列的直接通信方式：  
+
+![image](https://github.com/user-attachments/assets/0bbb9b65-a5f1-47d0-9acb-0abd389179b0)
+
+消息队列的间接通信方式（信箱）：  
+
+![image](https://github.com/user-attachments/assets/70233381-0e1c-40be-9918-d7b9dda2c56f)
+
+管道通信：
+
+![image](https://github.com/user-attachments/assets/96547058-ec5b-4b7e-8136-c7e54f55f44f)
+
+
+# 线程  
+
+### 线程概念  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
