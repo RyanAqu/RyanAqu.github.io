@@ -345,8 +345,8 @@ PCB可以自动保存程序运行上下文，也就可以在程序下CPU之后�
 调度的目标：
 * 公平性（Fairness）：确保所有进程或线程公平地获取资源。
 * 效率（Efficiency）：提高资源利用率，如 CPU 和内存的利用率。
-* 响应时间（Response Time）：交互式系统中，尽可能缩短任务响应的延迟。
-* 吞吐量（Throughput）：提高单位时间内完成的任务数量。
+* 响应时间（Response Time）：交互式系统中，尽可能缩短任务响应的延迟。作业完成时间-作业提交时间。
+* 吞吐量（Throughput）：提高单位时间内完成的任务数量。平均每秒完成的作业数量。
 * 实时性（Real-Time Capability）：实时系统中，确保任务在截止时间前完成。
 * 避免饥饿（Avoid Starvation）：确保低优先级任务不会无限等待。
 
@@ -362,13 +362,18 @@ PCB可以自动保存程序运行上下文，也就可以在程序下CPU之后�
 调度算法分类：  
 1. 非抢占式调度
     * 特点：进程/线程一旦获得 CPU，直到主动释放或结束运行，调度器才会切换。简单但可能导致低优先级任务长时间等待。
-    * 常见算法：先来先服务（FCFS）。最短作业优先（SJF）。
+    * 常见算法：
+        * 先来先服务（FCFS）：对长作业有利，对短作业不利，不会导致饥饿。
+        * 最短作业优先（SJF）：目前已经到达的运行时间最短的被调度。
 2. 抢占式调度
     * 特点：系统允许高优先级任务中断正在运行的任务。能更好地响应实时需求，提高系统的公平性。
-    * 常见算法：时间片轮转（Round Robin）。最短剩余时间优先（SRTF）。优先级调度（Priority Scheduling）。多级队列调度（Multilevel Queue Scheduling）。
+    * 常见算法：
+        * 时间片轮转（Round Robin）。
+        * 最短剩余时间优先（SRTF）。
+        * 优先级调度（Priority Scheduling）。
+        * 多级队列调度（Multilevel Queue Scheduling）。
 
 ![image](https://github.com/user-attachments/assets/1e6ddb68-e75c-4f80-8099-4c60795c350d)
-
 
 
 
