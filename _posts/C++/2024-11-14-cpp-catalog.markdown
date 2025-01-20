@@ -46,9 +46,6 @@ tags:
 [数据结构与基础算法][4]  
 
 # Linux 操作系统基础  
-![image](https://github.com/user-attachments/assets/9482eb99-7bd6-416d-8b5d-74475d3186a9)
-
-
 [Linux 下 Bash 命令基础][2]  
 [Linux 下 g++ 编译基础][3]  
 [Linux 下 gdb 调试][5]  
