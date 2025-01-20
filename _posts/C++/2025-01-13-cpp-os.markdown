@@ -16,6 +16,8 @@ tags:
 
 **纯理论八股复习**
 
+![image](https://github.com/user-attachments/assets/9482eb99-7bd6-416d-8b5d-74475d3186a9)
+
 # 操作系统绪论  
 ### 操作系统分类  
 * 分时操作系统
