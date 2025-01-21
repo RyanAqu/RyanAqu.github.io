@@ -523,9 +523,23 @@ struct hostent {
 
 ````
 
+# 封装socket成类
+
+### 封装客户端程序成ctcpclient类  
 
 
 
+
+
+
+
+
+
+
+
+
+
+### 封装服务端程序成ctcpserver类  
 
 
 
