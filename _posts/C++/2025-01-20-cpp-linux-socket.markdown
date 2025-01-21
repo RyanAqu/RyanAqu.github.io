@@ -209,7 +209,125 @@ int main(int argc,char* argv[])
 
 ````
 
+# 基于 Linux 的文件操作  
+Linux一切皆文件，socket操作与文件操作没有区别。所以在网络传输数据的过程中，可以使用文件I/O函数。  
+但实际开发中，一般使用C++流来操作文件，底层文件I/O操作大概理解就行。  
 
+### C++流文件操作  
+简单易用，面向对象的接口使得代码更具可读性和可维护性。自动管理缓冲区，减少了手动处理的麻烦。提供格式化的输入输出（如 <<, >> 运算符）。但是性能较低，尤其在需要大量I/O操作时。不够灵活，无法细粒度控制底层文件操作。  
+
+````
+#include <iostream>
+#include <fstream>
+#include <string>
+
+int main() {
+    // 写文件
+    std::ofstream outfile("example.txt");
+    if (outfile.is_open()) {
+        outfile << "Hello, World!" << std::endl;
+        outfile.close();
+    }
+
+    // 读文件
+    std::ifstream infile("example.txt");
+    std::string line;
+    if (infile.is_open()) {
+        while (std::getline(infile, line)) {
+            std::cout << line << std::endl;
+        }
+        infile.close();
+    }
+    return 0;
+}
+
+````
+
+### Linux底层I/O文件操作  
+Linux底层I/O操作通过系统调用实现，直接与操作系统的内核交互。这些操作是基于文件描述符的，通常使用 open(), read(), write(), close() 等系统调用来进行文件操作。  
+
+**创建和写文件**：  
+````
+//demo3.cpp:本程序演示linux底层文件操作-创建文件并写入数据
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<fcntl.h>
+#include<unistd.h>
+using namespace std;
+
+int main()
+{
+    int fd;//定义一个文件描述符/文件句柄
+    char buffer[1024];
+
+    fd=open("data.txt",O_CREAT|O_RDWR|O_TRUNC);//打开文件
+    if(fd==-1)
+    {
+        perror("open(data.txt)");
+        return -1;
+    }
+    printf("文件描述符fd=%d\n",fd);
+
+    strcpy(buffer,"hi\n");
+    if(write(fd,buffer,strlen(buffer))==-1)
+    {
+        perror("write()");
+        return -1;
+    }
+    close(fd);
+    return 0;
+}
+````
+
+**读操作**：  
+````
+//demo4.cpp:本程序演示linux底层文件操作-读取操作
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+#include<fcntl.h>
+#include<unistd.h>
+using namespace std;
+
+
+int main()
+{
+    int fd;//第年一一个文件描述符/文件句柄
+    fd=open("data.txt",O_RDONLY); //打开文件
+    if(fd==-1)
+    {
+        perror("open(data.txt)");return -1;
+    }
+    printf("文件描述符=%d\n",fd);
+    char buffer[1024];
+    memset(buffer,0,sizeof(buffer));
+
+    if(read(fd,buffer,sizeof(buffer))==-1)
+    {
+        perror("read()");
+        return -1;
+    }
+    printf("%s",buffer);
+
+    close(fd);// 关闭文件
+    return 0;
+}
+
+````
+
+**文件描述符**  
+在Linux内一切操作都是文件操作，利用ps -ef | grep demo3命令找到进程号，然后去根目录下的proc文件目录下找到对应进程号，其也是个文件目录，在其目录下有个fd文件目录，进入fd用ls即可以看到进程打开的文件描述符  
+````
+ps -ef | grep demo3  //譬如10370
+cd /proc/10370/fd
+ls
+````
+一般来说，每个进程都会打开0，1，2三个文件，其中0是标准输入（键盘cin），1是标准输出（显示器cout），2是标准错误（显示器cerr）。  
+如果在程序中用close()函数关掉这三个文件，那么将无法执行相应的标准输入输出错误功能。  
+所以sockfd其本质也是一个文件描述符，在对它使用send()函数和recv()函数时，可以等价替换为write()和read()函数。  
+
+**socket()创建的也是个文件，返回的是文件描述符！！！**
 
 
 
