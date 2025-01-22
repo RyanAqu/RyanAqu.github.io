@@ -1137,6 +1137,29 @@ int main(int argc,char* argv[])
 ````
 
 
+# socket实现文件传输功能  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
