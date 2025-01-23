@@ -1138,11 +1138,528 @@ int main(int argc,char* argv[])
 
 
 # socket实现文件传输功能  
+终端命令如下：  
+````
+ll aaa.txt     //查看aaa.txt的大小（字节数）
+ip addr        //查看服务端ip地址
+./demo9 192.168.183.128 5005 aaa.txt 748 //客户端程序（程序名+服务端IP+端口号+文件名+文件大小）
+./demo10 5005 ./temp        //服务端程序（程序名+端口号+接收文件的存放目录）
+````
+
+发送端程序：  
+````
+#include<iostream>
+#include<cstdio>
+#include<cstring>
+#include<cstdlib>
+#include<unistd.h>
+#include<netdb.h>
+#include<sys/types.h>
+#include<sys/socket.h>
+#include<arpa/inet.h>
+#include <fstream>
+using namespace std;
+/*
+ * demo9.cpp,socket实现文件传输
+ */
+
+class ctcpclient
+{
+public:
+    int m_clientfd;
+    string m_ip;
+    unsigned short m_port;
+
+    ctcpclient()
+    {
+        m_clientfd = -1;
+    }
+    ~ctcpclient()
+    {
+        m_Close();
+    }
+
+    //向服务端发起连接请求的成员函数，成功返回true，失败返回false
+    bool m_Connect(const string & in_ip,const unsigned short in_port)
+    {
+        if(m_clientfd!=-1)
+        {
+            //如果socket已经连接，直接返回失败
+            return false;
+        }
+        m_ip=in_ip;
+        m_port=in_port;
+        
+        //step1:create socket for client
+        m_clientfd = socket(AF_INET,SOCK_STREAM,0);
+        if(m_clientfd==-1)
+        {
+            return false;
+        }
+        //step2:send a request to the server
+        struct sockaddr_in servaddr;//存放服务端IP和端口的结构体
+        memset(&servaddr,0,sizeof(servaddr));
+        servaddr.sin_family = AF_INET;
+        servaddr.sin_port=htons(m_port);//指定服务端的通信端口
+
+        struct hostent* h;  //存放服务端IP的结构体
+        if((h=gethostbyname(m_ip.c_str()))==0)//用于存放服务端IP和端口的结构体
+        {
+            ::close(m_clientfd);
+            m_clientfd=-1;
+            return false;
+        }
+        memcpy(&servaddr.sin_addr,h->h_addr,h->h_length);//指定服务端的IP地址
+        if(connect(m_clientfd,(struct sockaddr*)&servaddr,sizeof(servaddr))!=0)//向服务端发起请求连接
+        {
+            ::close(m_clientfd);
+            m_clientfd=-1;
+            return false;
+        }
+        return true;
+    }
+    //发送字符串报文的成员函数
+    bool m_Send(const string &buffer)
+    {
+        if(m_clientfd==-1) return false;
+        //向服务端发送请求报文
+        if(::send(m_clientfd,buffer.data(),buffer.size(),0)<=0)
+        {
+            return false;
+        }
+        return true;
+    }
+    //发送结构体报文的成员函数
+    bool m_Send(void* buffer,const size_t size)
+    {
+        if(m_clientfd==-1) return false;
+        //向服务端发送请求报文
+        if(::send(m_clientfd,buffer,size,0)<=0)
+        {
+            return false;
+        }
+        return true;
+    }
+    bool m_SendFile(const string & filename,const size_t filesize)
+    {
+        ifstream fin(filename,ios::binary);
+        if(fin.is_open()==false)
+        {
+            cout<<"打开文件"<<filename<<"失败。\n";
+            return false;
+        }
+        int onread=0;   //每次调用fin.read()时打算读取的字节数。
+        int totalbytes=0; //从文件中已读取的字节总数
+        char buffer[4096]; //存放读取数据的buffer，Linux一次磁盘I/O是一页扇区，一般为4KB
+        while(true)
+        {
+            if(filesize-totalbytes>4096) onread=4096;
+            else onread = filesize-totalbytes;
+            //从文件中读取数据
+            fin.read(buffer,onread);
+            //把读取的数据发送到对端
+            if(m_Send(buffer,onread)==false) return false;
+            //计算已读取的字节数,如果文件已读完，跳出循环
+            totalbytes=totalbytes+onread;
+            if(totalbytes==filesize) break;
+        }
+
+        return true;
+    }
+    //接收服务端的报文的成员函数
+    bool m_Receive(string & buffer,const size_t maxlen)
+    {
+        buffer.clear();
+        buffer.resize(maxlen);
+        int iret = ::recv(m_clientfd,&buffer[0],buffer.size(),0);
+
+        if(iret<=0)
+        {
+            buffer.clear();
+            return false;
+        }
+        buffer.resize(iret);
+        return true;
+    }
+    //断开与服务端的连接
+    bool m_Close()
+    {
+        if(m_clientfd==-1) return false;
+        ::close(m_clientfd);
+        m_clientfd=-1;
+        return true;
+    }
+    
+};
 
 
 
+int main(int argc,char* argv[])
+{
+    if(argc!=5)
+    {
+        cout<<"Using \"ifconfig\" or \"ip addr\" to find ip"<<endl;
+        cout<<"Using ./demo9 服务端IP 服务端的端口 文件名 文件大小\n\n";
+        return -1;
+    }
+
+    ctcpclient tcpclient;
+    if(tcpclient.m_Connect(argv[1],atoi(argv[2]))==false)
+    {
+        perror("connect()");
+        return -1;
+    }
+
+    //以下实现发送文件  
+    //1.把待传输的文件名和文件大小告诉服务端
+    struct  st_fileinfo  //定义文件信息结构体
+    {
+        char filename[256]; //文件名
+        int filesize;       //文件大小
+    }fileinfo;
+    memset(&fileinfo,0,sizeof(fileinfo));
+    strcpy(fileinfo.filename,argv[3]);
+    fileinfo.filesize=atoi(argv[4]);
+    
+    //把文件信息结构体发给服务端
+    if(tcpclient.m_Send(&fileinfo,sizeof(fileinfo))==false)
+    {
+        perror("send");
+        return -1;
+    }
+    cout<<"发送文件信息的结构体"<<fileinfo.filename<<"("<<fileinfo.filesize<<")。"<<endl;
+
+    //2.等待服务端的确认报文（文件名和文件的大小确认）
+    string buffer;
+    if(tcpclient.m_Receive(buffer,2)==false)
+    {
+        perror("recv()");
+        return -1;
+    }
+    if(buffer!="ok")
+    {
+        cout<<"服务端回复的不是ok。\n";
+        return -1;
+    }
+    //3.发送文件内容
+    if(tcpclient.m_SendFile(fileinfo.filename,fileinfo.filesize)==false)
+    {
+        perror("sendfile()");
+        return -1;
+    }
+    //4.等待服务端的确认报文（服务端已接收完文件）
+    if(tcpclient.m_Receive(buffer,2)==false)
+    {
+        perror("recv()");
+        return -1;
+    }
+    if(buffer!="ok")
+    {
+        cout<<"服务端回复的不是ok。\n";
+        return -1;
+    }
+    cout<<"发送文件成功。\n";
+    return 0;
+}
+````
+
+接收端程序（可以实现多进程）：  
+````
+#include<iostream>
+#include<cstdio>
+#include<cstring>
+#include<cstdlib>
+#include<unistd.h>
+#include<netdb.h>
+#include<sys/types.h>
+#include<sys/socket.h>
+#include<arpa/inet.h>
+#include<signal.h>
+#include <fstream>
+using namespace std;
+
+/*
+ * demo10.cpp,多进程的socket通信的服务端，接收文件
+ */
+
+class ctcpserver
+{
+public:
+    int m_listenfd; //监听socket，-1表示未初始化
+    int m_clientfd; //客户端连上来的socket，-1表示客户端未连接
+    string m_clientip; //客户端字符串格式的IP
+    unsigned short m_port; //服务端用于通信的端口
+public:
+    ctcpserver():m_listenfd(-1),m_clientfd(-1)
+    {
+
+    }
+    
+    //初始化用于监听的socket  
+    bool initserver(const unsigned short in_port)
+    {
+        //第1步：创建服务端的socket
+        if((m_listenfd=socket(AF_INET,SOCK_STREAM,0))==-1)
+        {
+            return false;
+        }
+        m_port=in_port;
+        //第2步：把服务端用于通信的IP和端口绑定到socket上
+        struct sockaddr_in servaddr;   //用于存放服务端IP和端口的数据结构。
+        memset(&servaddr,0,sizeof(servaddr));
+        servaddr.sin_family = AF_INET; //指定协议
+        servaddr.sin_addr.s_addr=htonl(INADDR_ANY);//服务端任意网卡的IP都可以用于通讯。
+        servaddr.sin_port=htons(m_port);   //指定通信端口，普通用户只能使用1024以上的端口。
+
+        //绑定服务端的IP和端口   
+        if(bind(m_listenfd,(struct sockaddr *)&servaddr,sizeof(servaddr))==-1)
+        {
+            close(m_listenfd);
+            m_listenfd=-1;
+            return false;
+        }
+
+        //step3:把socket设置为可连接的状态
+        if(listen(m_listenfd,5)==-1)
+        {
+            close(m_listenfd);
+            m_listenfd=-1;
+            return false;
+        }
+        return true;
+    }
+    //受理客户的连接（从已连接的客户端中取出一个客户端）
+    //如果没有已连接的客户端，accept()函数将阻塞等待
+    bool m_Accept()
+    {
+        struct sockaddr_in caddr;//客户端地址信息
+        socklen_t addrlen=sizeof(caddr); //struct sockaddr_in的大小 
+        
+        if((m_clientfd=::accept(m_listenfd,(struct  sockaddr *)&caddr,&addrlen))==-1)
+        {
+            return false;
+        }
+        m_clientip=inet_ntoa(caddr.sin_addr); //把客户端的地址从大端序转换成字符串
+
+        return true;
+    }
+    //获取客户端的IP（字符串格式）
+    const string & m_Clientip() const
+    {
+        return m_clientip;
+    }
+    //向服务端发送报文，成功返回true，失败返回false
+    bool m_Send(const string & buffer)
+    {
+        if(m_clientfd==-1)
+        {          
+            return false;
+        }
+        if((::send(m_clientfd,buffer.data(),buffer.size(),0))<=0)
+        {
+            return false;
+        }
+        return true;
+    }
+    //接收字符串报文，成功返回true，失败返回false
+    //buffer存放接收报文内容，maxlen为本次接收报文的最大长度
+    bool m_Receive(string &buffer,const size_t maxlen)
+    {
+        buffer.clear();
+        buffer.resize(maxlen);
+        int readn =::recv(m_clientfd,&buffer[0],buffer.size(),0);
+        if(readn<=0)
+        {
+            buffer.clear();
+            return false;
+        }
+        buffer.resize(readn);
+
+        return true;
+    }
+    //接收结构体报文，成功返回true，失败返回false
+    //buffer存放接收报文内容，maxlen为本次接收报文的最大长度
+    bool m_Receive(void* buffer,const size_t size)
+    {
+        if(::recv(m_clientfd,buffer,size,0)<=0)
+        {
+            return false;
+        }
+        return true;
+    }
+    bool m_ReceiveFile(const string & filename,const size_t filesize)
+    {
+        ofstream fout;
+        fout.open(filename,ios::binary);
+        if(fout.is_open()==false)
+        {
+            cout<<"打开文件"<<filename<<"失败。\n";
+            return false;
+        }
+        int onread=0;   //打算接收的字节数。
+        int totalbytes=0; //已接受文件的字节总数
+        char buffer[4096]; //接收文件内容的的buffer，Linux一次磁盘I/O是一页扇区，一般为4KB
+        while(true)
+        {
+            if(filesize-totalbytes>4096) onread=4096;
+            else onread = filesize-totalbytes;
+            //接收文件内容
+            if(m_Receive(buffer,onread)==false) return false;
+            //把接收到的内容写入文件
+            fout.write(buffer,onread);
+            //计算已接收的字节数,如果文件接收完，跳出循环
+            totalbytes=totalbytes+onread;
+            if(totalbytes==filesize) break;
+        }
 
 
+        return true;
+    }
+    //关闭监听的socket
+    bool m_CloseListen()
+    {
+        if(m_listenfd==-1)
+        {
+            return false;
+        }
+        ::close(m_listenfd);
+        m_listenfd=-1;
+        return true;
+    }
+    //关闭客户端连接的socket
+    bool m_CloseClient()
+    {
+        if(m_clientfd==-1)
+        {
+            return false;
+        }
+        ::close(m_clientfd);
+        m_clientfd=-1;
+        return true;
+    }
+
+    ~ctcpserver()
+    {
+        m_CloseListen();
+        m_CloseClient();
+    }
+};
+ctcpserver tcpserver;
+void FathExit(int signum)//父进程的信号处理函数
+{
+    signal(SIGTERM,SIG_IGN);
+    signal(SIGINT,SIG_IGN);//防止被打断
+
+    cout<<"父进程退出，sig="<<signum<<endl;
+    kill(0,SIGTERM);//向子进程发送15信号，通知退出
+    //释放资源
+    tcpserver.m_CloseListen();
+    exit(0);
+}
+void ChldExit(int signum)//子进程的信号处理函数
+{
+    signal(SIGTERM,SIG_IGN);
+    signal(SIGINT,SIG_IGN);//防止被打断
+    cout<<"子进程"<<getpid()<<"退出，sig="<<signum<<endl;
+    tcpserver.m_CloseClient();
+    exit(0);
+}
+
+
+int main(int argc,char* argv[])
+{
+    if(argc!=3)
+    {
+        cout<<"Using ./demo10 通讯端口 文件存放的目录\nExample:./demo2 5005\n\n";//端口必须大于1024,不与其他的重复。
+        cout<<"注意：运行服务端程序的Linux系统的防火墙必须要开通5005端口。\n";
+        cout<<"   如果是云服务器，还要开通云平台的访问策略。\n\n";
+        return -1;
+    }
+
+    //忽略全部信号，不希望被打扰
+    for(int i=1;i<=64;i++)
+    {
+        signal(i,SIG_IGN);
+    }
+    //设置sell状态下可用kill进程号或ctrl+c正常终止进程
+    signal(SIGTERM,FathExit);
+    signal(SIGINT,FathExit);
+
+    //创建tcp
+    
+    if(tcpserver.initserver(atoi(argv[1]))==false)
+    {
+        perror("initserver()");
+        return -1;
+    }
+
+    while(true)
+    {
+        //受理客户端的连接请求，如果没有客户端连接，accept()函数将阻塞等待。
+        if(tcpserver.m_Accept()==false)
+        {
+            perror("accept()");
+            return -1;
+        }
+        //每有一个客户端连接，就分裂一个子进程出来受理，父进程继续受理
+        int pid=fork();
+        if(pid==-1)
+        {
+            perror("fork()");
+            return -1;//系统资源不足
+        }
+        if(pid>0) 
+        {
+            tcpserver.m_CloseClient();//父进程关闭客户端连接的socket
+            continue;//父进程返回开头
+        }
+
+        tcpserver.m_CloseListen();//子进程关闭监听的socket
+
+        //子进程重新设置信号
+        signal(SIGTERM,ChldExit);
+        signal(SIGINT,SIG_IGN);
+        
+        //子进程负责与客户端进行通信，接受客户端发送过来的报文后，回复ok。
+        cout<<"客户端已连接("<<tcpserver.m_Clientip()<<")\n";
+
+        //以下是接收文件的流程
+        //1.接收文件名和文件大小信息
+        struct  st_fileinfo  //定义文件信息结构体
+        {
+            char filename[256]; //文件名
+            int filesize;       //文件大小
+        }fileinfo;
+        memset(&fileinfo,0,sizeof(fileinfo));
+        //用结构体存放接收报文的内容
+        if(tcpserver.m_Receive(&fileinfo,sizeof(fileinfo))==false)
+        {
+            perror("recv()");
+            return -1;
+        }
+        cout<<"文件信息结构体"<<fileinfo.filename<<"("<<fileinfo.filesize<<")。"<<endl;
+        //2.给客户端回复确认报文，表示可以发送文件了
+        if(tcpserver.m_Send("ok")==false)
+        {
+            perror("send");break;
+        }
+        //3.接收文件内容
+        if(tcpserver.m_ReceiveFile(string(argv[2])+"/"+fileinfo.filename,fileinfo.filesize)==false)
+        {
+            cout<<"接收文件失败。\n";
+            return -1;
+        }
+        cout<<"接收文件成功。\n";
+        //4.给客户端恢复确认报文，表示文件接收完成
+        tcpserver.m_Send("ok");
+
+        exit(0);//子进程一定要退出，否则又会回到accept
+
+    }
+
+    return 0;
+}
+````
 
 
 
