@@ -46,7 +46,7 @@ tags:
 [数据结构与基础算法][4]  
 
 # Linux 操作系统基础  
-[CSDN上关于APUE/内核编程的优质文章](https://blog.csdn.net/weixin_36750623/article/details/127408987)  
+[CSDN上一篇关于APUE/内核编程的优质文章](https://blog.csdn.net/weixin_36750623/article/details/127408987)  
 [Linux 下 Bash 命令基础][2]  
 [Linux 下 g++ 编译基础][3]  
 [Linux 下 gdb 调试][5]  
@@ -69,7 +69,7 @@ tags:
 [6]:https://ryanaqu.github.io/2025/01/10/cpp-linux-operate/
 [7]:https://ryanaqu.github.io/2025/01/11/cpp-linux-signalprocess/
 [8]:https://ryanaqu.github.io/2025/01/20/cpp-linux-socket/
-[9]:
+[9]:https://ryanaqu.github.io/2025/01/23/cpp-linux-netioreuse/
 
 
 
