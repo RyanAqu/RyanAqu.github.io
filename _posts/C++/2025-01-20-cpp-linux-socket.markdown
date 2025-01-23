@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "Linux Socket网络编程 Part1"
+title:      "Linux Socket网络编程"
 subtitle:   " \"learning……\""
 date:       2025-01-20 19:29:00
 author:     "Ryan"
