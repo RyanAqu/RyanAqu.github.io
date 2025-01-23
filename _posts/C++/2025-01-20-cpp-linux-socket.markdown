@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "Linux 网络编程 Part1"
+title:      "Linux Socket网络编程 Part1"
 subtitle:   " \"learning……\""
 date:       2025-01-20 19:29:00
 author:     "Ryan"
@@ -21,7 +21,7 @@ tags:
 * 客户程序：指主动发起通讯的程序。  
 * 服务程序端：被动等待，然后为向他发起通讯的客户端提供服务。
 
-# 第一个网络通信程序  
+# 第一个socket网络通信程序  
 
 ### 客户端  
 使用g++对demo1进行编译，然后使用bash命令查看服务端的ip和端口，利用./demo1 IP 端口号 运行程序  
