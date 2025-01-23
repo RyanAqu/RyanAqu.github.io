@@ -11,11 +11,7 @@ tags:
     - linux
     - socket
     - 网络编程
-    - 网络IO复用
-    - select
-    - poll
-    - epoll
-    - TCP/IP
+    - select/poll/epoll
 ---
 
 
