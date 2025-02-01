@@ -41,6 +41,7 @@ tags:
 # C++
 [C Basic & C With Classes][0]  
 [C++ 泛型 & STL 标准模板库][1]  
+[C++11新特性 lambda表达式][10]
 
 # 基础算法&数据结构
 [数据结构与基础算法][4]  
@@ -70,7 +71,7 @@ tags:
 [7]:https://ryanaqu.github.io/2025/01/11/cpp-linux-signalprocess/
 [8]:https://ryanaqu.github.io/2025/01/20/cpp-linux-socket/
 [9]:https://ryanaqu.github.io/2025/01/23/cpp-linux-netioreuse/
-
+[10]:https://ryanaqu.github.io/2025/02/01/cpp-lambda/
 
 
 
