@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "Linux下poll/epoll模型"
+title:      "Linux 下 poll/epoll模型"
 subtitle:   " \"learning……\""
 date:       2025-01-23 20:14:00
 author:     "Ryan"
