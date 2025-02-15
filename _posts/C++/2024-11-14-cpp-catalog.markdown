@@ -22,10 +22,11 @@ tags:
 * 有的note可能有点“巨长”。
 
 
-# C++
+# C++  
+[C++ 学习路线和就业方向](https://ryanaqu.github.io/2024/11/14/cpp-careerdirection/)  
 [C Basic & C With Classes](https://ryanaqu.github.io/2024/12/01/cpp-basic-class/)  
 [C++ 泛型 & STL 标准模板库](https://ryanaqu.github.io/2024/12/13/cpp-generic-stl/)  
-[C++11新特性 lambda表达式](https://ryanaqu.github.io/2025/02/01/cpp-lambda/)
+[C++11新特性 lambda表达式](https://ryanaqu.github.io/2025/02/01/cpp-lambda/)  
 
 # 基础算法&数据结构
 [数据结构与基础算法](https://ryanaqu.github.io/2025/01/05/cpp-algorithm-datastructure/)  
@@ -45,7 +46,7 @@ tags:
 
 # 基于RIS-V指令集架构的Xv6操作系统内核优化  
 本项目以MIT6.S081课程为向导,基于RIS-V指令集架构的xv6操作系统为基础,对其系统调用,内存管理,进程管理,中断,文件系统等模块进行优化和扩展  
-[一个比较好的参考资料](https://xv6.dgs.zone/)
+[一个比较好的参考资料](https://xv6.dgs.zone/)  
 
 
 
