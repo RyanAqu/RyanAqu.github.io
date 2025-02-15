@@ -28,7 +28,14 @@ tags:
 [C++ 泛型 & STL 标准模板库](https://ryanaqu.github.io/2024/12/13/cpp-generic-stl/)  
 [C++11新特性 lambda表达式](https://ryanaqu.github.io/2025/02/01/cpp-lambda/)  
 
-# 基础算法&数据结构
+# 基础算法&数据结构  
+## 算法  
+[最简单的贪心算法]()  
+
+## 数据结构  
+
+
+
 [数据结构与基础算法](https://ryanaqu.github.io/2025/01/05/cpp-algorithm-datastructure/)  
 
 # Linux 操作系统基础  
