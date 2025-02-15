@@ -30,7 +30,7 @@ tags:
 
 # 基础算法&数据结构  
 ## 算法  
-[最简单的贪心算法]()  
+[最简单的贪心算法](https://ryanaqu.github.io/2025/01/05/cpp-algorithm-greedy/)  
 
 ## 数据结构  
 
