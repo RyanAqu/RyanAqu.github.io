@@ -46,6 +46,7 @@ tags:
 [Linux 下 gdb 调试](https://ryanaqu.github.io/2025/01/10/cpp-gdb/)  
 [Linux 系统操作基础](https://ryanaqu.github.io/2025/01/10/cpp-linux-operate/)  
 [Linux 信号与进程](https://ryanaqu.github.io/2025/01/11/cpp-linux-signalprocess/)  
+[Linux 生产消费者模型实现](https://ryanaqu.github.io/2025/01/12/cpp-linux-pcmodel/)  
 [Linux Socket网络编程](https://ryanaqu.github.io/2025/01/20/cpp-linux-socket/)  
 [Linux 下 TCP/IP协议](https://ryanaqu.github.io/2025/01/23/cpp-linux-netioreuse/)  
 [Linux 下 select网络I/O复用模型](https://ryanaqu.github.io/2025/01/23/cpp-linux-netioreuse1/)  
