@@ -181,8 +181,56 @@ public:
 633.整数能否拆成平方和。  
 680.验证回文串II  
 524.归并两个有序数组的变形题。  
-340.至多包含 K 个不同字符的最长子串。  
 
+340.至多包含 K 个不同字符的最长子串：题目要求的是找到一个字符串中，至多包含 K 个不同字符的最长子串的长度。这是一个典型的滑动窗口问题，使用双指针技术来实现。  
+
+````
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <algorithm>
+
+using namespace std;
+
+class Solution {
+public:
+    int lengthOfLongestSubstringKDistinct(string s, int k) {
+        unordered_map<char, int> map; // 用于存储字符及其频次
+        int left = 0;  // 滑动窗口的左指针
+        int maxLength = 0;  // 最大子串长度
+
+        for (int right = 0; right < s.length(); ++right) {
+            map[s[right]]++;  // 增加右指针指向字符的频次
+
+            // 如果不同字符数超过k，收缩窗口
+            while (map.size() > k) {
+                map[s[left]]--;  // 减少左指针指向字符的频次
+                if (map[s[left]] == 0) {
+                    map.erase(s[left]);  // 移除字符，保持哈希表内字符数不超过k
+                }
+                left++;  // 移动左指针
+            }
+
+            // 更新最大子串长度
+            maxLength = max(maxLength, right - left + 1);
+        }
+
+        return maxLength;
+    }
+};
+
+int main() {
+    Solution solution;
+    string s = "eceba";
+    int k = 2;
+
+    int result = solution.lengthOfLongestSubstringKDistinct(s, k);
+    cout << "Length of longest substring with at most " << k << " distinct characters: " << result << endl;
+    
+    return 0;
+}
+
+````
 
 
 
