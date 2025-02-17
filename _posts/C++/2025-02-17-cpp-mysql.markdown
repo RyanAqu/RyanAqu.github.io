@@ -1,0 +1,308 @@
+---
+layout:     post
+title:      "MySql 基础"
+subtitle:   " \"learning……\""
+date:       2025-02-17 17:12:00
+author:     "Ryan"
+header-img: "img/bg-walle.jpg"
+catalog: true
+tags:
+    - c++
+    - MySql
+---
+
+> 不要抱怨，抱我。
+
+
+# MySql简介  
+MySQL 是一种开源的关系型数据库管理系统（RDBMS），它使用结构化查询语言（SQL）进行数据存储和管理。MySQL 是由 MySQL AB 开发的，后来被 Sun Microsystems（现为 Oracle Corporation）收购。由于其高效性、稳定性和广泛的社区支持，MySQL 已经成为世界上最流行的数据库之一。  
+
+# Linux安装MySQL8.0和基础命令  
+**安装命令** 
+````
+sudo apt install mysql-server
+````
+
+**配置安全设置**
+````
+sudo mysql_secure_installation
+````
+
+**检查MySQL是否正常工作**
+````
+systemctl status mysql
+````
+
+**连接MySQL**  
+````
+sudo mysql -u root -p
+````
+看到mysql提示符说明连接成功了。
+
+**MySQL查看自带的数据库**
+````
+mysql> show schemas;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+4 rows in set (0.00 sec)
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+4 rows in set (0.00 sec)
+
+````
+
+**退出**
+````
+mysql>quit;
+````
+
+**更新权限**
+````
+mysql>flush priviledges;
+````
+
+# MySQL地址权限  
+很多时候数据库服务是独立安装在远程服务器上的，为了方便，一般会使用可视化客户端工具连接到远程服务器，但常常会连接失败。为了连接成功，一般会进行一些配置。  
+
+**显示端口**
+````
+mysql> show variables like '%port';
++--------------------------+-------+
+| Variable_name            | Value |
++--------------------------+-------+
+| admin_port               | 33062 |
+| large_files_support      | ON    |
+| mysqlx_port              | 33060 |
+| port                     | 3306  |
+| report_port              | 3306  |
+| require_secure_transport | OFF   |
++--------------------------+-------+
+6 rows in set (0.02 sec)
+````
+
+**查看和更改访问权限**
+````
+mysql> use mysql;          //选择一个数据库，一般来说下载完MySQL会自动创建一个mysql数据库，可以直接use
+select user,host from user where user='root';//查看权限，如果host字段是localhost，表示这个用户只能在本地访问
++------+-----------+
+| user | host      |
++------+-----------+
+| root | localhost |
++------+-----------+
+
+update user set host='%' where user='root'; //将host字段改为%，就可以在任何地方访问了。（会带来安全风险）
+````
+
+
+# MySQL的使用  
+![image](https://github.com/user-attachments/assets/af00af58-9d7a-49fe-a769-42c1749c07f7)  
+
+### 创建和删除数据库  
+首先登入数据库：  
+````
+sudo mysql -u root -p  //登入
+mysql>show databases;  //查看已经存在的数据库
+````
+
+使用CREATE语句创建数据库：  
+````
+mysql> create database game;  //创建game数据库
+
+mysql> show databases;        //再查看一下，发现game数据库已经创建完成。
++--------------------+
+| Database           |
++--------------------+
+| game               |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+5 rows in set (0.00 sec)
+````
+
+使用DROP语句删除数据库：  
+````
+mysql> drop database game;    //删除game数据库
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> show databases;        //再查看一下，发现game数据库已经删除完成。
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+4 rows in set (0.00 sec)
+````
+
+### 在数据库中创建表、调整表与删除表    
+首先使用USE语句来进入数据库：  
+````
+mysql> use game;              //选择数据库
+Database changed
+````
+
+使用CREATE语句来建表，使用desc语句来查看表结构，使用show tables查看所有存在的表：  
+````
+mysql> create table player(id INT,name VARCHAR(100),level INT,exp INT,gold DECIMAL(10,2));  //  create table 表名(变量名);
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> DESC player;           //使用desc语句查看表的结构
++-------+---------------+------+-----+---------+-------+
+| Field | Type          | Null | Key | Default | Extra |
++-------+---------------+------+-----+---------+-------+
+| id    | int           | YES  |     | NULL    |       |
+| name  | varchar(100)  | YES  |     | NULL    |       |
+| level | int           | YES  |     | NULL    |       |
+| exp   | int           | YES  |     | NULL    |       |
+| gold  | decimal(10,2) | YES  |     | NULL    |       |
++-------+---------------+------+-----+---------+-------+
+5 rows in set (0.00 sec)
+
+mysql> show tables;           //使用show语句查看当前数据库的所有的表
++----------------+
+| Tables_in_game |
++----------------+
+| player         |
++----------------+
+1 row in set (0.00 sec)
+
+````
+
+使用alter语句来修改表：  
+````
+mysql> ALTER TABLE player MODIFY COLUMN name VARCHAR(200);   //使用MODIFY修改表的参数
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE player RENAME COLUMN name to nick_name;   //使用RENAME修改参数名字
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE player ADD COLUMN last_login DATETIME;    //使用ADD增加一个新的字段
+Query OK, 0 rows affected (0.06 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+
+mysql> desc player;                                          //实现的效果，可以看到name已经变成了nick_name，type类型也发生了改变，且增加了一个字段
++------------+---------------+------+-----+---------+-------+
+| Field      | Type          | Null | Key | Default | Extra |
++------------+---------------+------+-----+---------+-------+
+| id         | int           | YES  |     | NULL    |       |
+| nick_name  | varchar(200)  | YES  |     | NULL    |       |
+| level      | int           | YES  |     | NULL    |       |
+| exp        | int           | YES  |     | NULL    |       |
+| gold       | decimal(10,2) | YES  |     | NULL    |       |
+| last_login | datetime      | YES  |     | NULL    |       |
++------------+---------------+------+-----+---------+-------+
+6 rows in set (0.00 sec)
+
+mysql> ALTER TABLE player DROP COLUMN last_login;            //使用drop删除字段
+Query OK, 0 rows affected (0.06 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> DESC player;                                          //实现效果，字段last_login已经被删除
++-----------+---------------+------+-----+---------+-------+
+| Field     | Type          | Null | Key | Default | Extra |
++-----------+---------------+------+-----+---------+-------+
+| id        | int           | YES  |     | NULL    |       |
+| nick_name | varchar(200)  | YES  |     | NULL    |       |
+| level     | int           | YES  |     | NULL    |       |
+| exp       | int           | YES  |     | NULL    |       |
+| gold      | decimal(10,2) | YES  |     | NULL    |       |
++-----------+---------------+------+-----+---------+-------+
+5 rows in set (0.00 sec)
+````
+
+使用DROP TABLE删除表：  
+````
+mysql> create table player1(id INT);    //创建表player1
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> show tables;                     //查看
++----------------+
+| Tables_in_game |
++----------------+
+| player         |
+| player1        |
++----------------+
+2 rows in set (0.00 sec)
+
+mysql> DROP TABLE player1;              //使用DROP TABLE删除表
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> show tables;                     //效果
++----------------+
+| Tables_in_game |
++----------------+
+| player         |
++----------------+
+1 row in set (0.00 sec)
+
+````
+
+
+### 表的数据操作  
+使用INSERT INTO插入数据：  
+````
+mysql> INSERT INTO player VALUES (1,'张三',1,1,1);      //插入数据，insert into后面跟表的名称，values后面跟数据值，前面是参数名，可以灵活变动
+Query OK, 1 row affected (0.01 sec)
+````
+
+使用select语句来查看数据：  
+````
+mysql> select * from player;                //*表示查询所有，from后面跟表的名称
++------+--------+-------+------+------+
+| id   | name   | level | exp  | gold |
++------+--------+-------+------+------+
+|    1 | 张三   |     1 |    1 | 1.00 |
++------+--------+-------+------+------+
+1 row in set (0.00 sec)
+````
+
+使用INSERT INTO插入多条数据（数据之间用逗号隔开）：  
+````
+mysql> INSERT INTO player (id,name) VALUES (2,'李四'),(3,'王五');    //插入多条数据
+Query OK, 2 rows affected (0.01 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> select * from player;                                        //查看效果
++------+--------+-------+------+------+
+| id   | name   | level | exp  | gold |
++------+--------+-------+------+------+
+|    1 | 张三   |     1 |    1 | 1.00 |
+|    2 | 李四   |  NULL | NULL | NULL |
+|    3 | 王五   |  NULL | NULL | NULL |
++------+--------+-------+------+------+
+3 rows in set (0.00 sec)
+````
+
+
+
+
+
+
+
+
+
+
+
+
+
