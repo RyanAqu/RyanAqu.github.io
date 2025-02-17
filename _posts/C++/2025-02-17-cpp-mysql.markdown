@@ -20,6 +20,8 @@ MySQL 是一种开源的关系型数据库管理系统（RDBMS），它使用结
 git clone https://github.com/geekhournet/mysql-course        //一份sql文件包，可以用来实操
 ````
 
+ps：这个玩意学起来和shell脚本似的，各种嵌套各种关键字还有正则表达式，很简单，巨容易学，也巨容易忘。
+
 # Linux安装MySQL8.0和基础命令  
 **安装命令** 
 ````
@@ -424,6 +426,8 @@ mysql> desc player;                                        //player表也发生�
 ````
 
 ### 常用语句  
+有超级多的关键字，建议有什么需求先去网上查一下或者chatgpt  
+
 ##### select语句变形  
 NOT>AND>OR，括号可以改变优先级：   
 ````
@@ -561,7 +565,94 @@ mysql> select * FROM player WHERE email is null OR email='';    //
 ````
 mysql> select * FROM player ORDER BY level;        //升序排序
 mysql> select * FROM player ORDER BY level DESC;   //降序排序
+mysql> select * FROM player ORDER BY level DESC,exp ASC;    //等级降序，经验升序
 ````
+
+##### 聚合函数（有很多，这里只列举几个）  
+计数函数：  
+````
+mysql> select COUNT(*) FROM player;        //计数
++----------+
+| COUNT(*) |
++----------+
+|      209 |
++----------+
+1 row in set (0.01 sec)
+````
+
+均值函数：  
+````
+mysql> select AVG(level) FROM player;        //所有玩家的等级均值
++------------+
+| AVG(level) |
++------------+
+|    55.0813 |
++------------+
+1 row in set (0.00 sec)
+````
+
+##### group by分组  
+````
+mysql> select sex,COUNT(*) FROM player group by sex;
++------+----------+
+| sex  | COUNT(*) |
++------+----------+
+| 男   |      140 |
+| 女   |       65 |
+| NULL |        3 |
+|      |        1 |
++------+----------+
+4 rows in set (0.00 sec)
+
+//分组后having过滤，然后降序
+mysql> select level,COUNT(*) FROM player group by level having count(level)>4 order by COUNT(level) DESC;
++-------+----------+
+| level | COUNT(*) |
++-------+----------+
+|    13 |        9 |
+|    96 |        7 |
+|    95 |        5 |
+|    88 |        5 |
+|    54 |        5 |
++-------+----------+
+5 rows in set (0.00 sec)
+````
+
+
+### 子查询  
+有的时候，我们需要使用一个查询结果作为另一个查询的条件。  
+````
+mysql> select * from player where level > (select AVG(level) from player);  //把一个查询套上括号
+````
+
+查询结果创建新表：  
+````
+mysql> create table new_table (select * from player where level < 5);
+Query OK, 4 rows affected (0.03 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> show tables;
++----------------+
+| Tables_in_game |
++----------------+
+| equip          |
+| item           |
+| new_player     |
+| new_table      |
+| npc            |
+| npc_other      |
+| player         |
+| ranking        |
+| skill          |
+| top10          |
++----------------+
+10 rows in set (0.00 sec)
+````
+
+### 表关联  
+表关联用来查询多个表中的数据，关联的表必须要有相同字段。  
+
+
 
 
 
