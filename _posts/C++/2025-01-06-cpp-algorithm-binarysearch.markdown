@@ -66,11 +66,52 @@ int main() {
 
 ````
 
+# 查找区间  
+leetcode.34.在排序数组中查找元素的第一个和最后一个位置：给定一个增序的整数数组和一个值，查找该值第一次和最后一次出现的位置。  
 
+二分查找变形（找到目标值之后向右或者向左重新二分查找）：  
+````
+class Solution {
+public:
+    vector<int> searchRange(vector<int>& nums, int target) {
+        vector<int>result={-1,-1};
+        return{binarys(nums,0,nums.size()-1,target,false),binarys(nums,0,nums.size()-1,target,true)};
 
+    }
+    int binarys(vector<int>& nums,int left,int right,int target,bool index)
+    {
+        int result=-1;
+        while(left<=right)
+        {
+            int mid=(left+right)/2;
+            if(nums[mid]==target)
+            {
+                result=mid;
+                if(index)
+                {
+                    left=mid+1;
+                }
+                else
+                {
+                    right=mid-1;
+                }
+            }
+            else if(nums[mid]>target)
+            {
+                right=mid-1;
+            }
+            else
+            {
+                left=mid+1;
+            }
+        }
+        return result;
+    }
+};
+````
 
-
-
+# 旋转数组查数字  
+leecode.81.搜索旋转排序数组II：一个原本增序的数组被首尾相连后按某个位置断开。给定一个值，判断这个值是否存在于这个为旋转数组中。  
 
 
 
