@@ -11,8 +11,13 @@ tags:
     - Redis
 ---
 
+> 多点自知之明，少点自作多情。
 
 
+# Redis简介  
+Redis（Remote Dictionary Server）是一个开源的高性能键值对（key-value）数据库，通常用作缓存、消息队列和持久化数据存储系统。它基于内存进行操作，因此非常快速，并且提供了丰富的数据结构支持，如字符串、哈希、列表、集合、有序集合等，广泛应用于高并发、高性能场景中。  
+
+![image](https://github.com/user-attachments/assets/370ba8a2-5360-486d-8913-67e7006436f9)
 
 
 
