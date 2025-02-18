@@ -19,9 +19,7 @@ Redis（Remote Dictionary Server）是一个开源的高性能键值对（key-va
 
 ![image](https://github.com/user-attachments/assets/370ba8a2-5360-486d-8913-67e7006436f9)
 
-# Redis命令和基础操作  
-命令集合：  
-[RedisCheatSheet-ByGeekHour.pdf](https://github.com/user-attachments/files/18840717/RedisCheatSheet-ByGeekHour.pdf)
+
 
 # Ubuntu下Redis下载安装  
 ````
@@ -51,7 +49,10 @@ ryan@ubuntu:~$ redis-cli
 * 地理空间：存储和查询地理位置数据。
 * 流：用于处理实时数据流和事件。
 
+# Redis命令和基础操作  
+**这个文档很重要，所有数据类型的操作都在这里**
 
+[RedisCheatSheet-ByGeekHour.pdf](https://github.com/user-attachments/files/18840717/RedisCheatSheet-ByGeekHour.pdf)  
 
 
 
