@@ -19,7 +19,8 @@ Redis（Remote Dictionary Server）是一个开源的高性能键值对（key-va
 
 ![image](https://github.com/user-attachments/assets/370ba8a2-5360-486d-8913-67e7006436f9)
 
-
+命令表：  
+[RedisCheatSheet-ByGeekHour.pdf](https://github.com/user-attachments/files/18840717/RedisCheatSheet-ByGeekHour.pdf)
 
 
 
