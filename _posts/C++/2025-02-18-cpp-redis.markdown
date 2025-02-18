@@ -19,8 +19,47 @@ Redis（Remote Dictionary Server）是一个开源的高性能键值对（key-va
 
 ![image](https://github.com/user-attachments/assets/370ba8a2-5360-486d-8913-67e7006436f9)
 
-命令表：  
+# Redis命令和基础操作  
+命令集合：  
 [RedisCheatSheet-ByGeekHour.pdf](https://github.com/user-attachments/files/18840717/RedisCheatSheet-ByGeekHour.pdf)
+
+# Ubuntu下Redis下载安装  
+````
+sudo apt update                  //更新
+sudo apt install redis-server    //安装redis
+sudo systemctl status redis      //检查运行状态
+````
+
+
+# 连接Redis  
+用redis-cli命令连接，也可以使用redisinsight图形化工具使用redis  
+````
+ryan@ubuntu:~$ redis-cli
+127.0.0.1:6379> 
+````
+
+
+# 数据类型  
+支持以下数据类型：  
+* 字符串：最基本的数据类型，支持多种操作。
+* 哈希：键值对集合，适合存储对象。
+* 列表：有序的字符串集合，支持从两端操作。
+* 集合：无序的唯一元素集合，支持集合操作。
+* 有序集合：带分数的有序集合，支持排名功能。
+* 位图：用于处理大规模的布尔数据。
+* HyperLogLog：高效估算唯一元素的数量。
+* 地理空间：存储和查询地理位置数据。
+* 流：用于处理实时数据流和事件。
+
+
+
+
+
+
+
+
+
+
 
 
 
