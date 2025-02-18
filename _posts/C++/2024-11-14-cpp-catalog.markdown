@@ -33,6 +33,7 @@ tags:
 [贪心算法](https://ryanaqu.github.io/2025/01/05/cpp-algorithm-greedy/)  
 [千奇百怪的排序算法](https://ryanaqu.github.io/2025/01/05/cpp-algorithm-sort/)  
 [双指针](https://ryanaqu.github.io/2025/01/05/cpp-algorithm-twopointers/)  
+[二分查找](https://ryanaqu.github.io/2025/01/06/cpp-algorithm-binarysearch/)  
 
 ## 数据结构  
 
