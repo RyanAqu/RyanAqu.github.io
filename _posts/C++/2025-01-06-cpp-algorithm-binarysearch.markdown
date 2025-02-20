@@ -136,9 +136,46 @@ public:
 
 # 旋转数组查数字  
 leecode.81.搜索旋转排序数组II：一个原本增序的数组被首尾相连后按某个位置断开。给定一个值，判断这个值是否存在于这个为旋转数组中。  
+**题解：**即使数组被旋转过，我们仍然可以利用这个数组的递增性，使用二分查找。对于当前的中点，如果它指向的值小于等于右端，那么说明右区间是排好序的；反之，那么说明左区间是排好序的。如果目标值位于排好序的区间内，我们可以对这个区间继续二分查找；反之，我们对于另一半区间继续二分查找。注意，因为数组存在重复数字，如果中点和左端的数字相同，我们并不能确定是左区间全部相同，还是右区间完全相同。在这种情况下，我们可以简单地将左端点右移一位，然后继续进行二分查找。  
 
+````
+class Solution {
+public:
+    bool search(vector<int>& nums, int target) {
+        int left=0,right=nums.size()-1;
+        while(left<=right)
+        {
+            int mid=(left+right)/2;
+            if(nums[mid]==target) return true;
 
-
+            if(nums[left]==nums[mid]) left++;//判断不出哪边有序
+            else if(nums[mid]<=nums[right])
+            {//右区间增序
+                if (target > nums[mid] && target <= nums[right]) 
+                {
+                    left = mid + 1;
+                } 
+                else 
+                {
+                    right = mid - 1;
+                }
+            }
+            else
+            {//左区间增序
+                if (target < nums[mid] && target >= nums[left]) 
+                {
+                    right = mid - 1;
+                } 
+                else 
+                {
+                    left = mid + 1;
+                }
+            }
+        }
+        return false;
+    }
+};
+````
 
 
 
