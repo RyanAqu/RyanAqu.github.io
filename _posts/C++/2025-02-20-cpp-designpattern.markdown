@@ -27,7 +27,7 @@ tags:
 * 不容易扩展：单例模式将类的实例化过程与具体实现绑定在一起，不容易扩展。
 * 并发问题：在多线程环境中，需要确保实例化过程的线程安全，否则会出现多个实例。
 
-### 代码  
+### 单例模式  
 ````
 class Singleton {
 private:
@@ -55,8 +55,100 @@ int main() {
     cout << singleton2 << endl;
     return 0;
 }
+````
+
+但是当前的单例模式可能**线程不安全**，需要以下方法实现线程安全。  
+
+### 线程安全的懒汉模式  
+线程安全的单例模式是指确保在多线程环境下，单例类的实例只会被创建一次，并且在不同线程中共享同一个实例。为了避免多线程环境下可能出现的竞争条件和不一致性问题，需要使用适当的同步机制来确保线程安全。  
+````
+#include <iostream>
+#include <mutex>
+
+class Singleton {
+private:
+    static Singleton* instance;
+    static std::mutex mtx;  // 用于保护实例化过程的互斥锁
+
+    // 私有构造函数，防止外部直接创建实例
+    Singleton() {}
+
+public:
+    // 禁止拷贝构造和赋值
+    Singleton(const Singleton&) = delete;
+    Singleton& operator=(const Singleton&) = delete;
+
+    // 获取唯一实例
+    static Singleton* getInstance() {
+        // 锁住实例化过程，保证线程安全
+        if (instance == nullptr) {
+            std::lock_guard<std::mutex> lock(mtx);  // 防止多个线程同时进入
+            if (instance == nullptr) {
+                instance = new Singleton();
+            }
+        }
+        return instance;
+    }
+
+    void showMessage() {
+        std::cout << "Hello, I am a Singleton!" << std::endl;
+    }
+};
+
+// 初始化静态成员变量
+Singleton* Singleton::instance = nullptr;
+std::mutex Singleton::mtx;
+
+int main() {
+    Singleton* s1 = Singleton::getInstance();
+    s1->showMessage();
+    return 0;
+}
 
 ````
+
+### 线程安全的饿汉模式  
+饿汉式在程序启动时就创建实例，通常是在静态初始化时完成实例化，因此不需要额外的同步机制，天然线程安全。  
+````
+#include <iostream>
+
+class Singleton {
+private:
+    // 在类内部就进行静态实例化，保证线程安全
+    static Singleton instance;
+
+    // 私有构造函数，防止外部创建实例
+    Singleton() {}
+
+public:
+    // 禁止拷贝构造和赋值
+    Singleton(const Singleton&) = delete;
+    Singleton& operator=(const Singleton&) = delete;
+
+    // 获取唯一实例
+    static Singleton& getInstance() {
+        return instance;
+    }
+
+    void showMessage() {
+        std::cout << "Hello, I am a Singleton!" << std::endl;
+    }
+};
+
+// 静态成员初始化
+Singleton Singleton::instance;
+
+int main() {
+    Singleton& s1 = Singleton::getInstance();
+    s1.showMessage();
+    return 0;
+}
+
+````
+
+
+
+
 
 # 工厂模式  
 工厂模式提供了一种创建对象的方式，而不需要明确指定具体类的实例化过程。通过工厂方法，客户端能够通过简单的接口创建各种对象，而不需要知道具体的实现类。这种模式帮助我们将对象的创建与对象的使用解耦。  
