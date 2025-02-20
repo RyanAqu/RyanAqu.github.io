@@ -44,51 +44,45 @@ tags:
 
 ### 冒泡排序  
 ````
-#include<iostream>
-#include<vector>
-using namespace std;
-
-void bubbleSort(vector<int>& arr){
-    int n=arr.size();
-    for(int i=0;i<n-1;++i){
-        bool swapped = false;
-        for(int j=0;j<n-1-i;++j){
-            if(arr[j]>arr[j+1]) {
-            swap(arr[j],arr[j+1]);
-            swapped = true;
+void BubbleSort(vector<int>& nums)
+{
+    for(int i=0;i<nums.size()-1;++i)
+    {
+        int flag=1;
+        for(int j=0;j<nums.size()-i-1;++j)
+        {
+            if(nums[j]>nums[j+1])
+            {
+                swap(nums[j],nums[j+1]);
+                flag=0;
             }
-            
         }
-        if(!swapped) break;
+        if(flag) return;
     }
-
-}
-
-int main(){
-    vector<int> arr = {5, 2, 9, 1, 5, 6};
-
-    cout<<"Unsorted array:";
-    for(int num:arr){
-        cout<<num<<" ";
-    }
-    cout<<endl;
-
-    bubbleSort(arr);
-
-    cout<<"Sorted array:";
-    for(int num:arr){
-        cout<<num<<" ";
-    }
-    cout<<endl;
-
-    return 0;
 }
 ````
 
+### 选择排序  
+````
+void SelectSort(vector<int>& nums)
+{
+    int n=nums.size();
+    for(int i=0;i<n;i++)
+    {
+        int minindex=i;
+        for(int j=i+1;j<n;j++)
+        {
+            if(nums[j]<nums[minindex]) minindex=j;
+        }
+        if(minindex!=i) swap(nums[minindex],nums[i]);
+    }
+}
+````
 
+### 插入排序  
+````
 
-
-
+````
 
 
 
