@@ -58,6 +58,146 @@ int main() {
 
 ````
 
+# 工厂模式  
+工厂模式提供了一种创建对象的方式，而不需要明确指定具体类的实例化过程。通过工厂方法，客户端能够通过简单的接口创建各种对象，而不需要知道具体的实现类。这种模式帮助我们将对象的创建与对象的使用解耦。  
+
+适用场景：
+* 系统中有多个类，而且这些类都属于同一类型，并且需要在运行时选择具体类时。
+* 当我们需要根据输入的不同，创建不同种类的对象时。
+
+实现方式：
+* 工厂模式一般有两种实现方式：简单工厂模式和工厂方法模式。
+* 简单工厂模式：通过一个工厂类来创建对象，根据传入的参数来决定创建哪个对象。
+* 工厂方法模式：定义一个创建对象的接口，由子类来决定实例化哪个类。
+
+### 简单工厂模式  
+````
+#include <iostream>
+using namespace std;
+
+// 产品类
+class Product {
+public:
+    virtual void operation() = 0;
+};
+
+// 具体产品A
+class ProductA : public Product {
+public:
+    void operation() override {
+        cout << "ProductA operation" << endl;
+    }
+};
+
+// 具体产品B
+class ProductB : public Product {
+public:
+    void operation() override {
+        cout << "ProductB operation" << endl;
+    }
+};
+
+// 工厂类
+class Factory {
+public:
+    // 根据类型创建不同的产品
+    static Product* createProduct(char type) {
+        if (type == 'A') {
+            return new ProductA();
+        } else if (type == 'B') {
+            return new ProductB();
+        }
+        return nullptr;
+    }
+};
+
+int main() {
+    Product* productA = Factory::createProduct('A');
+    productA->operation();
+    
+    Product* productB = Factory::createProduct('B');
+    productB->operation();
+    
+    delete productA;
+    delete productB;
+
+    return 0;
+}
+
+````
+
+### 工厂方法模式  
+````
+#include <iostream>
+using namespace std;
+
+// 产品类
+class Product {
+public:
+    virtual void operation() = 0;
+};
+
+// 具体产品A
+class ProductA : public Product {
+public:
+    void operation() override {
+        cout << "ProductA operation" << endl;
+    }
+};
+
+// 具体产品B
+class ProductB : public Product {
+public:
+    void operation() override {
+        cout << "ProductB operation" << endl;
+    }
+};
+
+// 抽象工厂
+class Creator {
+public:
+    virtual Product* createProduct() = 0;
+};
+
+// 具体工厂A
+class CreatorA : public Creator {
+public:
+    Product* createProduct() override {
+        return new ProductA();
+    }
+};
+
+// 具体工厂B
+class CreatorB : public Creator {
+public:
+    Product* createProduct() override {
+        return new ProductB();
+    }
+};
+
+int main() {
+    Creator* creatorA = new CreatorA();
+    Product* productA = creatorA->createProduct();
+    productA->operation();
+    
+    Creator* creatorB = new CreatorB();
+    Product* productB = creatorB->createProduct();
+    productB->operation();
+
+    delete creatorA;
+    delete creatorB;
+    delete productA;
+    delete productB;
+
+    return 0;
+}
+
+````
+
+
+
+
+
 
 
 
