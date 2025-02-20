@@ -36,9 +36,54 @@ tags:
 以下是一些最基本的排序算法。虽然在 C++ 里可以通过 std::sort() 快速排序，而且刷题时很少需要自己手写排序算法，但是熟习各种排序算法可以加深自己对算法的基本理解，以及解出由这些排序算法引申出来的题目。
 
 ### STL中sort的底层实现  
+快排优化  
+* 当排的数过少时，当前递归采用插排（n<32）。
+* 当递归深度过深时，转为堆排序。
+* 为防止O(n2)退化，采用三数取中法。
+
 
 ### 冒泡排序  
+````
+#include<iostream>
+#include<vector>
+using namespace std;
 
+void bubbleSort(vector<int>& arr){
+    int n=arr.size();
+    for(int i=0;i<n-1;++i){
+        bool swapped = false;
+        for(int j=0;j<n-1-i;++j){
+            if(arr[j]>arr[j+1]) {
+            swap(arr[j],arr[j+1]);
+            swapped = true;
+            }
+            
+        }
+        if(!swapped) break;
+    }
+
+}
+
+int main(){
+    vector<int> arr = {5, 2, 9, 1, 5, 6};
+
+    cout<<"Unsorted array:";
+    for(int num:arr){
+        cout<<num<<" ";
+    }
+    cout<<endl;
+
+    bubbleSort(arr);
+
+    cout<<"Sorted array:";
+    for(int num:arr){
+        cout<<num<<" ";
+    }
+    cout<<endl;
+
+    return 0;
+}
+````
 
 
 
