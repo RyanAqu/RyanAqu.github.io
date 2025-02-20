@@ -26,7 +26,8 @@ tags:
 [C++ 学习路线和就业方向](https://ryanaqu.github.io/2024/11/15/cpp-careerdirection/)  
 [C Basic & C With Classes](https://ryanaqu.github.io/2024/12/01/cpp-basic-class/)  
 [C++ 泛型 & STL 标准模板库](https://ryanaqu.github.io/2024/12/13/cpp-generic-stl/)  
-[C++11新特性 lambda表达式](https://ryanaqu.github.io/2025/02/01/cpp-lambda/)  
+[C++ 11新特性 lambda表达式](https://ryanaqu.github.io/2025/02/01/cpp-lambda/)  
+[C++ 设计模式](https://ryanaqu.github.io/2025/02/20/cpp-designpattern/)  
 
 # 基础算法&数据结构  
 ## 算法  
