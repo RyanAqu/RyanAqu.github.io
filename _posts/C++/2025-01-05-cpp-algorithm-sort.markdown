@@ -118,6 +118,67 @@ void ShellSort(vector<int>& nums)
 }
 ````
 
+### 快排  
+````
+int partition(vector<int>& nums,int start,int end)
+{
+    int left=start+1,right=end;
+    while(left<right)
+    {
+        while(nums[left]<=nums[start]&&left<right)
+        {
+            left++;
+        }
+        while(nums[right]>=nums[start]&&left<right)
+        {
+            right--;
+        }
+        swap(nums[left],nums[right]);
+    }
+    if(nums[left]<nums[start])
+    {
+        swap(nums[left],nums[start]);
+        return left;
+    }
+    else
+    {
+        swap(nums[left-1],nums[start]);
+        return left-1;
+    }
+
+}
+void QuickSort(vector<int>& nums,int left,int right)
+{
+    if(left<right)
+    {
+        int pivotindex=partition(nums,left,right);
+        QuickSort(nums,pivotindex+1,right);
+        QuickSort(nums,left,pivotindex-1);
+    }
+}
+````
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
