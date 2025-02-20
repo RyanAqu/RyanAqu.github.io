@@ -16,6 +16,7 @@ tags:
 # 算法描述  
 二分查找也常被称为二分法或者折半查找，每次查找时通过将待查找区间分成两部分并只取一部分继续查找，将查找的复杂度大大减少。对于一个长度为 O(n) 的数组，二分查找的时间复杂度为 O(log n)。
 
+非递归：  
 ````
 #include <iostream>
 #include <vector>
@@ -65,6 +66,29 @@ int main() {
 }
 
 ````
+
+递归实现的二分查找：  
+````
+int binarySearch(const vector<int>& nums,int left,int right,int target)
+{
+    if(left>right) return -1;
+    int mid=(left+right)/2;
+    if(nums[mid]==target)
+    {
+        return mid;
+    }
+    else if(nums[mid]>target)
+    {
+        return binarySearch(nums,left,mid-1,target);
+    }
+    else
+    {
+        return binarySearch(nums,mid+1,right,target);
+    }
+}
+````
+
+
 
 # 查找区间  
 leetcode.34.在排序数组中查找元素的第一个和最后一个位置：给定一个增序的整数数组和一个值，查找该值第一次和最后一次出现的位置。  
