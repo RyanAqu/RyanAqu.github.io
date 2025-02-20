@@ -81,10 +81,42 @@ void SelectSort(vector<int>& nums)
 
 ### 插入排序  
 ````
-
+void InsertSort(vector<int>& nums)
+{
+    for(int i =1;i<nums.size();++i)
+    {
+        int key=nums[i];
+        int j=i-1;
+        while(j>=0&&nums[j]>key)
+        {
+            nums[j+1]=nums[j];
+            j--;
+        }
+        nums[j+1]=key;
+    }
+}
 ````
 
-
+### 希尔排序  
+````
+void ShellSort(vector<int>& nums)
+{
+    for(int gap=nums.size()/2;gap>0;gap/=2)
+    {
+        for(int i = gap;i<nums.size();i++)
+        {
+            int key=nums[i];
+            int j=i-gap;
+            while(j>=0&&nums[j]>key)
+            {
+                nums[j+gap]=nums[j];
+                j-=gap;
+            }
+            nums[j+gap]=key;
+        }
+    }
+}
+````
 
 
 
