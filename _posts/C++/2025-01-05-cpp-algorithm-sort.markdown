@@ -158,7 +158,56 @@ void QuickSort(vector<int>& nums,int left,int right)
 }
 ````
 
+### 快速选择  
+````
 
+````
+
+
+### 堆排序  
+以leetcode215为例，堆排序解决数组中的第K个最大元素（自己实现的一个堆）  
+````
+class Solution {
+public:
+    void maxheapdown(vector<int>& nums,int i,int heapsize)
+    {
+        int l=2*i+1,r=2*i+2,largest =i;
+        if(l<heapsize&&nums[l]>nums[largest])
+        {
+            largest=l;
+        }
+        if(r<heapsize&&nums[r]>nums[largest])
+        {
+            largest=r;
+        }
+        if(largest!=i)
+        {
+            swap(nums[largest],nums[i]);
+            maxheapdown(nums,largest,heapsize);
+        }
+
+    }
+    void makeheap(vector<int>& nums,int heapsize)
+    {
+        for(int i=nums.size()/2-1;i>=0;--i)
+        {
+            maxheapdown(nums,i,heapsize);
+        }
+    }
+    int findKthLargest(vector<int>& nums, int k) {
+        int heapsize=nums.size();
+        makeheap(nums,heapsize);
+
+        for(int i=nums.size()-1;i>=nums.size()-k+1;--i)
+        {
+            swap(nums[i],nums[0]);
+            --heapsize;
+            maxheapdown(nums,0,heapsize);
+        }
+        return nums[0];
+    }
+};
+````
 
 
 
