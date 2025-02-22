@@ -23,6 +23,52 @@ tags:
 
 
 # 自定义堆  
+堆的操作有建堆，堆化（堆下沉），pop  
+
+首先是最核心的堆化操作（这里以**最大堆下沉**为例）：检查父节点是否比所有子节点大，否的话父节点与最大子节点交换，一直重复到堆的最下方  
+````
+void maxheapdown(vector<int>&nums,int i)
+{
+    int left=2*i+1;
+    int right=2*i+2;
+    int largest=i;
+    if(left<nums.size()&&nums[largest]<nums[left])
+    {
+        largest=left;
+    }
+    if(right<nums.size()&&nums[largest]<nums[right])
+    {
+        largest=right;
+    }
+    if(largest!=i) 
+    {
+        swap(nums[largest],nums[i]);
+        maxheapdown(nums,largest);
+    }
+}
+````
+
+建堆的操作就是对所有的父节点进行检查和堆化  
+````
+void makeheap(vector<int>& nums)
+{
+    for(int i=nums.size()/2-1;i>=0;i--)
+    {
+        maxheapdown(nums,i);
+    }
+}
+````
+
+出堆的操作就是交换堆顶到最下方（数组头和尾互换），然后排除数组尾，对堆顶进行一次堆化操作  
+````
+void heappop(vector<int>& nums)
+{
+    swap(nums[0],nums[nums.size()-1]);
+    nums.pop_back();
+    maxheapdown(nums,0);
+}
+````
+
 
 
 # STL的优先级队列使用方法  
