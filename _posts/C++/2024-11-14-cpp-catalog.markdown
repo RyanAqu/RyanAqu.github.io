@@ -37,7 +37,7 @@ tags:
 [二分查找](https://ryanaqu.github.io/2025/01/06/cpp-algorithm-binarysearch/)  
 
 ## 数据结构  
-
+[并查集](https://ryanaqu.github.io/2025/02/22/CPP-datastruct-unionfind/)  
 [数据结构与基础算法](https://ryanaqu.github.io/2025/01/05/cpp-algorithm-datastructure/)  
 
 # Linux 操作系统基础  
