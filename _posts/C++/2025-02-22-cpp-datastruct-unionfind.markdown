@@ -99,7 +99,48 @@ int main() {
 
 ````
 
-
+### leetcode.547省份数量  
+````
+class Solution {
+public:
+    int Find(vector<int>&parent,int index)
+    {
+        if(parent[index]!=index)
+        {
+            parent[index]=Find(parent,parent[index]);
+        }
+        return parent[index];
+    }
+    void Union(vector<int>&parent,int i,int j)
+    {
+        parent[Find(parent,i)]=Find(parent,j);
+    }
+    int findCircleNum(vector<vector<int>>& isConnected) {
+        int n=isConnected.size();
+        vector<int>parent(n);
+        for(int i=0;i<n;i++)
+        {
+            parent[i]=i;
+        }
+        for(int i=0;i<n;i++)
+        {
+            for(int j=i+1;j<n;j++)
+            {
+                if(isConnected[i][j]==1)
+                {
+                    Union(parent,i,j);
+                }
+            }
+        }
+        int cnt=0;
+        for(int i=0;i<n;++i)
+        {
+            if(parent[i]==i) cnt++;
+        }
+        return cnt;
+    }
+};
+````
 
 
 
