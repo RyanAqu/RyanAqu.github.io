@@ -61,7 +61,7 @@ tags:
 # 基于RIS-V指令集架构的Xv6操作系统内核优化  
 本项目以MIT6.S081课程为向导,基于RIS-V指令集架构的xv6操作系统为基础,对其系统调用,内存管理,进程管理,中断,文件系统等模块进行优化和扩展  
 [一个比较好的参考资料](https://xv6.dgs.zone/)  
-[Lab0：实验配置 by CSDN 上一篇关于Ubuntu环境下搭建实验环境的文章](https://blog.csdn.net/qq_16933601/article/details/119861396?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_utm_term~default-0-119861396-blog-136204566.235^v43^pc_blog_bottom_relevance_base3&spm=1001.2101.3001.4242.1&utm_relevant_index=3)
+[Lab0：实验配置 by CSDN 上一篇关于Ubuntu环境下搭建实验环境的文章](https://blog.csdn.net/LostUnravel/article/details/120397168)
 
 
 
