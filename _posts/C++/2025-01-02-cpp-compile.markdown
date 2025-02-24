@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "g++ 编译细节和库制作"
+title:      "g++ 编译细节、库制作和Makefile"
 subtitle:   " \"learning……\""
 date:       2025-01-02 17:16:00
 author:     "Ryan"
@@ -13,6 +13,19 @@ tags:
 ---
 
 > Hey,亲爱的工作狂先生，新的一年不要对自己太苛刻了～
+
+# VScode和g++11下载  
+用以下命令下载VScode，下载完之后安装chinese拓展、C++拓展、makefile拓展  
+````
+sudo snap install code --classic	//下载code
+````
+
+用以下命令下载g++编译工具  
+````
+sudu apt install g++
+````
+
+
 
 # 编译过程  
 C++ 编译过程可以分为预处理、编译、汇编、链接等几个主要的阶段，每个阶段的输出都会成为下一阶段的输入。
