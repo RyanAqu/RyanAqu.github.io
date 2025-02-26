@@ -64,7 +64,20 @@ tags:
 [Lab0：实验配置 by CSDN 上一篇关于Ubuntu环境下搭建实验环境的文章](https://blog.csdn.net/LostUnravel/article/details/120397168)  
 [Lab0：实验配置 by 知乎 上一篇关于Windows环境下搭建实验环境的文章](https://zhuanlan.zhihu.com/p/449687883)  
 
+GDB调试  
+````
+make qemu        //直接make
+make qemu-gdb    //带GDB调试的make
+gdb-multiarch    //在另一个窗口打开gdb进行调试
+有如下结果说明进入成功
+0x0000000000001000 in ?? ()
+````
 
-
+````
+gdb中输入c即启动，bt有如下结果
+(gdb) bt
+#0  scheduler () at kernel/proc.c:465
+#1  0x0000000080000f1c in main () at kernel/main.c:44
+````
 
 
