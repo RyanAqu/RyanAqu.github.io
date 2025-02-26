@@ -67,6 +67,7 @@ tags:
 启动GDB调试：  
 ````
 make qemu        //直接make
+ctrl+a->松开->x  //退出xv6系统
 make qemu-gdb    //带GDB调试的make
 make qemu-gdb CPUS=1    //需要单核启动可以设置此参数
 gdb-multiarch    //在另一个窗口打开gdb进行调试
