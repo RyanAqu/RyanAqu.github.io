@@ -68,6 +68,7 @@ GDB调试
 ````
 make qemu        //直接make
 make qemu-gdb    //带GDB调试的make
+make qemu-gdb CPUS=1    //需要单核启动可以设置此参数
 gdb-multiarch    //在另一个窗口打开gdb进行调试
 有如下结果说明进入成功
 0x0000000000001000 in ?? ()
