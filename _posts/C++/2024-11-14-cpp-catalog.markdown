@@ -87,6 +87,7 @@ GDB常规调试：
 break main        //打断点
 info register     //查看寄存器
 step              //单步执行
+step n            //执行n步
 ````
 
 
