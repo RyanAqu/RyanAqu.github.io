@@ -74,8 +74,9 @@ gdb-multiarch    //在另一个窗口打开gdb进行调试
 0x0000000000001000 in ?? ()
 ````
 
+系统运行（gdb中输入continue命令）：  
 ````
-gdb中输入c即启动，bt有如下结果
+gdb中输入c即启动，此时Xv6操作系统可以正常使用，bt有如下结果
 (gdb) bt
 #0  scheduler () at kernel/proc.c:465
 #1  0x0000000080000f1c in main () at kernel/main.c:44
