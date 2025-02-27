@@ -64,6 +64,20 @@ tags:
 [Lab0：实验配置 by CSDN 上一篇关于Ubuntu环境下搭建实验环境的文章](https://blog.csdn.net/LostUnravel/article/details/120397168)  
 [Lab0：实验配置 by 知乎 上一篇关于Windows环境下搭建实验环境的文章](https://zhuanlan.zhihu.com/p/449687883)  
 
+版本控制：建议每个实验checkout到相应的分支，然后创建相应的测试分支，完成后没有问题在进行合并merge（也可以不合并）  
+````
+git checkout util         # 切换到util分支
+git checkout -b util_test # 建立并切换到util的测试分支
+
+git add .
+git commit -m "完成了第一个作业"
+git checkout util
+git merge util_test
+git push github util:util
+
+git branch   //查看分支
+````
+
 启动GDB调试：  
 ````
 make qemu        //直接make
