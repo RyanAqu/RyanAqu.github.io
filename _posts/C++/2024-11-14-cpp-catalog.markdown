@@ -68,9 +68,12 @@ tags:
 
 ### 版本控制和GDB
 建议每个实验checkout到相应的分支，然后创建相应的测试分支，完成后没有问题在进行合并merge（也可以不合并）  
+**注意：** 在切换分支的时候一定要跟踪远程分支，否则Git 不知道要从哪个远程分支拉取更新，因此需要手动指定  
 ````
-git checkout util         # 切换到util分支
+git checkout util      # 切换到util分支（不跟踪）
+git checkout -b util origin/util  # 切换到util分支（并跟踪）
 git checkout -b util_test # 建立并切换到util的测试分支
+
 
 git add .
 git commit -m "完成了第一个作业"
