@@ -60,11 +60,14 @@ tags:
 
 # 基于RIS-V指令集架构的Xv6操作系统内核优化  
 本项目以MIT6.S081课程为向导,基于RIS-V指令集架构的xv6操作系统为基础,对其系统调用,内存管理,进程管理,中断,文件系统等模块进行优化和扩展  
+
+### 学习资料和环境搭建  
 [一个比较好的学习资料](https://xv6.dgs.zone/)  
 [Lab0：实验配置 by CSDN 上一篇关于Ubuntu环境下搭建实验环境的文章](https://blog.csdn.net/LostUnravel/article/details/120397168)  
 [Lab0：实验配置 by 知乎 上一篇关于Windows环境下搭建实验环境的文章](https://zhuanlan.zhihu.com/p/449687883)  
 
-版本控制：建议每个实验checkout到相应的分支，然后创建相应的测试分支，完成后没有问题在进行合并merge（也可以不合并）  
+### 版本控制和GDB
+建议每个实验checkout到相应的分支，然后创建相应的测试分支，完成后没有问题在进行合并merge（也可以不合并）  
 ````
 git checkout util         # 切换到util分支
 git checkout -b util_test # 建立并切换到util的测试分支
@@ -105,8 +108,10 @@ step              //单步执行
 step n            //执行n步
 ````
 
+### Lab代码仓库  
+fork了实验原始main分支，然后完成所有main下分支的lab，每一个完成的lab都在对应的“分支名+_test”的分支中。    
 [Xv6操作系统个人实验代码仓库（更新中...）](https://github.com/RyanAqu/MIT6.S081-2020-labs)  
-fork了实验原始main分支，然后完成所有main下分支的lab，每一个完成的lab都在对应的“分支名+_test”的分支中。  
+[Lab1：Makefile、基本系统调用、多进程编程、文件描述符、IPC管道、sleep、find、pingpong、primes、xargs](https://github.com/RyanAqu/MIT6.S081-2020-labs/tree/util_test)  
 
 
 
