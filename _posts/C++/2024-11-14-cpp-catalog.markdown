@@ -36,6 +36,7 @@ tags:
 [双指针](https://ryanaqu.github.io/2025/01/05/cpp-algorithm-twopointers/)  
 [二分查找](https://ryanaqu.github.io/2025/01/06/cpp-algorithm-binarysearch/)  
 [搜索算法](https://ryanaqu.github.io/2025/01/06/cpp-algorithm-search/)  
+[回溯算法](https://ryanaqu.github.io/2025/01/07/cpp-algorithm-backtrack/)  
 
 ## 数据结构  
 [堆和优先级队列](https://ryanaqu.github.io/2025/02/22/cpp-datastruct-heap/)  
