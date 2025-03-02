@@ -56,6 +56,130 @@ void func(vector<int>& nums,vector<bool>& used,vector<int>& current,vector<vecto
 };
 ````
 
+# 组合  
+leetcode77  
+````
+class Solution {
+private:
+    void bt(int& n, int& k,int start,vector<int>& current,vector<bool>&used,vector<vector<int>>&result)
+    {
+        if(current.size()==k)
+        {
+            result.push_back(current);
+            return;
+        }
+        for(int i=start;i<=n;++i)
+        {
+            if(used[i])continue;
+            used[i]=true;
+            current.push_back(i);
+            bt(n,k,i+1,current,used,result);
+            used[i]=false;
+            current.pop_back();
+
+        }
+    }
+public:
+    vector<vector<int>> combine(int n, int k) {
+        vector<vector<int>>result;
+        vector<int> current;
+        vector<bool>used(n+1,false);
+        bt(n,k,1,current,used,result);
+        return result;
+    }
+};
+````
+
+
+
+
+
+# 搜索  
+leetcode79  
+````
+class Solution {
+private:
+    bool bt(vector<vector<char>>& board, string& word,int index,int row,int column)
+    {
+        if(index==word.size()) return true;
+        if(row<0||column<0||row>=board.size()||column>=board[0].size()||word[index]!=board[row][column]) return false;
+        //找到了
+        char temp=board[row][column];
+        board[row][column]='#';
+        bool find=bt(board,word,index+1,row-1,column)||bt(board,word,index+1,row+1,column)||bt(board,word,index+1,row,column-1)||bt(board,word,index+1,row,column+1);
+        board[row][column]=temp;
+        return find;
+    }
+public:
+    bool exist(vector<vector<char>>& board, string word) {
+        for(int i=0;i<board.size();i++)
+        {
+            for(int j=0;j<board[0].size();j++)
+            {
+                if(bt(board,word,0,i,j)) return true;
+            }
+        }
+        return false;
+    }
+};
+````
+
+
+
+
+# 放置方案  
+leetcode.51.N皇后  
+````
+class Solution {
+    void bt(int& n,int row,vector<string>& board,unordered_set<int>& columns,unordered_set<int>& diagonals1,unordered_set<int>& diagonals2,vector<vector<string>>&result)
+    {
+        if(row==n)
+        {
+            result.push_back(board);
+            return;
+        }
+        for(int col=0;col<n;++col)
+        {
+            if(columns.count(col)||diagonals1.count(row+col)||diagonals2.count(row-col)) continue;
+
+            board[row][col]='Q';
+            columns.insert(col);
+            diagonals1.insert(row+col);
+            diagonals2.insert(row-col);
+            bt(n,row+1,board,columns,diagonals1,diagonals2,result);
+            board[row][col]='.';
+            columns.erase(col);
+            diagonals1.erase(row+col);
+            diagonals2.erase(row-col);
+        }
+    }
+public:
+    vector<vector<string>> solveNQueens(int n) {
+        vector<vector<string>>result;
+        vector<string> board(n,string(n,'.'));//初始化棋盘
+        unordered_set<int> columns;
+        unordered_set<int> diagonals1;
+        unordered_set<int> diagonals2;
+        bt(n,0,board,columns,diagonals1,diagonals2,result);
+        return result;
+    }
+};
+````
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
