@@ -166,7 +166,9 @@ public:
 };
 ````
 
-
+# 练习  
+leetcode.133.分割回文串  
+leetcode.78.子集  
 
 
 
