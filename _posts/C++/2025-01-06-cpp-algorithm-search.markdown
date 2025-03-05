@@ -145,7 +145,7 @@ leetcode.934.最短的桥
 
 `````
 class Solution {
-    vector<vector<int>> directions={{-1,0},{1,0},{0,-1},{0,1}};
+    vector<vector<int>> directions={  { -1,0},{1,0},{0,-1},{0,1}};
 public:
     int shortestBridge(vector<vector<int>>& grid) {
         int steps=0;
