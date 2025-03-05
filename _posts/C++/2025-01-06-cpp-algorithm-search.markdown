@@ -226,7 +226,7 @@ public:
         // 记录扩展出的单词是在第几次扩展的时候得到的，key：单词，value：在广度优先搜索的第几层
         unordered_map<string, int> steps = {{beginWord, 0}};
         // 记录了单词是从哪些单词扩展而来，key：单词，value：单词列表，这些单词可以变换到 key ，它们是一对多关系
-        unordered_map<string, set<string>> from = 
+        unordered_map<string, set<string>> from = {{beginWord, {} } };
         int step = 0;
         bool found = false;
         queue<string> q = queue<string>{{beginWord}};
