@@ -139,69 +139,6 @@ public:
  
 这里要注意，深度优先搜索和广度优先搜索都可以处理可达性问题，即从一个节点开始是否能达到另一个节点。因为深度优先搜索可以利用递归快速实现，很多人会习惯使用深度优先搜索刷此类题目。实际软件工程中，笔者很少见到递归的写法，因为一方面难以理解，另一方面可能产生栈溢出的情况；而用栈实现的深度优先搜索和用队列实现的广度优先搜索在写法上并没有太大差异，因此使用哪一种搜索方式需要根据实际的功能需求来判断。  
 
-### 基础BFS  
-leetcode.934.最短的桥  
-给定一个二维 0-1 矩阵，其中 1 表示陆地，0 表示海洋，每个位置与上下左右相连。已知矩阵中有且只有两个岛屿，求最少要填海造陆多少个位置才可以将两个岛屿相连。  
-````
-class Solution {
-    vector<vector<int>> directions={{-1,0},{1,0},{0,-1},{0,1}};
-public:
-    int shortestBridge(vector<vector<int>>& grid) {
-        int steps=0;
-        queue<pair<int,int>>q;
-        //找第一个岛
-        for(int i=0;i<grid.size();++i)
-        {
-            for(int j=0;j<grid[0].size();++j)
-            {
-                if(grid[i][j]==1) 
-                {
-                    dfs(grid,i,j,q);
-                    goto end;
-                }
-            }
-        }
-        end://跳出多重for循环  
-        while(!q.empty())
-        {
-            int size=q.size();
-            while(size--)
-            {
-                auto [x, y] = q.front();
-                q.pop();
-                for(auto& d:directions)
-                {
-                    int nx=x+d[0],ny=y+d[1];
-                    if(nx>=0&&ny>=0&&nx<grid.size()&&ny<grid[0].size())//未越界
-                    {
-                        if(grid[nx][ny]==1)return steps;
-                        if(grid[nx][ny]==0)
-                        {
-                            grid[nx][ny]=2;
-                            q.push({nx,ny});
-                        }
-                        
-                    }
-                }
-            }
-            steps++;
-        }
-        return steps;
-        
-    }
-    void dfs(vector<vector<int>>& grid,int i,int j,queue<pair<int,int>>&q)
-    {
-        if(i<0||j<0||i>=grid.size()||j>=grid[0].size()||grid[i][j]!=1)return;//越界或者是水
-        grid[i][j]=2;//标记已访问
-        q.push({i,j});
-        dfs(grid,i-1,j,q);
-        dfs(grid,i+1,j,q);
-        dfs(grid,i,j-1,q);
-        dfs(grid,i,j+1,q);
-    }
-};
-````
-
 
 
 
