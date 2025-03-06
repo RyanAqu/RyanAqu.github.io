@@ -41,6 +41,7 @@ tags:
 ## 数据结构  
 [堆和优先级队列](https://ryanaqu.github.io/2025/02/22/cpp-datastruct-heap/)  
 [并查集](https://ryanaqu.github.io/2025/02/22/cpp-datastruct-unionfind/)  
+[Trie前缀树](https://ryanaqu.github.io/2025/02/23/cpp-datastruct-trie/)  
 [数据结构与基础算法](https://ryanaqu.github.io/2025/01/05/cpp-algorithm-datastructure/)  
 
 # Linux 操作系统基础  
