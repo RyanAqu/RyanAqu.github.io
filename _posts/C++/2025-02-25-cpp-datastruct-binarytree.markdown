@@ -491,7 +491,193 @@ int main() {
     * 右旋：将当前节点的左子树提升到当前节点的位置，将当前节点降为右子节点。
 
 
+### 红黑树的插入修复
+插入新节点后，红黑树的性质可能被破坏，特别是第 4 条和第 5 条。此时，我们需要通过旋转和着色操作来恢复平衡。插入的修复过程可以分为以下几种情况：
+* 新插入的节点是根节点：只需要将其颜色设为黑色。
+* 新插入的节点的父节点是黑色的：不需要任何修复。
+* 新插入的节点的父节点是红色的：
+    * 如果叔叔节点是红色：将父节点和叔叔节点的颜色改为黑色，将祖父节点的颜色改为红色，然后向上继续修复。
+    * 如果叔叔节点是黑色或不存在：需要旋转和调整颜色来恢复红黑树的平衡
 
+### demo  
+````
+#include <iostream>
+using namespace std;
+
+enum Color { RED, BLACK };
+
+struct Node {
+    int data;
+    Node* left;
+    Node* right;
+    Node* parent;
+    Color color;
+
+    Node(int val) : data(val), left(nullptr), right(nullptr), parent(nullptr), color(RED) {}
+};
+
+class RedBlackTree {
+private:
+    Node* root;
+    Node* TNULL;  // 辅助空节点，所有叶子节点和NULL节点都指向这个节点
+
+    // 左旋操作
+    void leftRotate(Node* x) {
+        Node* y = x->right;
+        x->right = y->left;
+        if (y->left != TNULL) {
+            y->left->parent = x;
+        }
+        y->parent = x->parent;
+        if (x->parent == nullptr) {
+            root = y;
+        } else if (x == x->parent->left) {
+            x->parent->left = y;
+        } else {
+            x->parent->right = y;
+        }
+        y->left = x;
+        x->parent = y;
+    }
+
+    // 右旋操作
+    void rightRotate(Node* x) {
+        Node* y = x->left;
+        x->left = y->right;
+        if (y->right != TNULL) {
+            y->right->parent = x;
+        }
+        y->parent = x->parent;
+        if (x->parent == nullptr) {
+            root = y;
+        } else if (x == x->parent->right) {
+            x->parent->right = y;
+        } else {
+            x->parent->left = y;
+        }
+        y->right = x;
+        x->parent = y;
+    }
+
+    // 插入修复
+    void fixInsert(Node* k) {
+        Node* u;
+        while (k->parent->color == RED) {
+            if (k->parent == k->parent->parent->right) {
+                u = k->parent->parent->left;
+                if (u->color == RED) {
+                    u->color = BLACK;
+                    k->parent->color = BLACK;
+                    k->parent->parent->color = RED;
+                    k = k->parent->parent;
+                } else {
+                    if (k == k->parent->left) {
+                        k = k->parent;
+                        rightRotate(k);
+                    }
+                    k->parent->color = BLACK;
+                    k->parent->parent->color = RED;
+                    leftRotate(k->parent->parent);
+                }
+            } else {
+                u = k->parent->parent->right;
+                if (u->color == RED) {
+                    u->color = BLACK;
+                    k->parent->color = BLACK;
+                    k->parent->parent->color = RED;
+                    k = k->parent->parent;
+                } else {
+                    if (k == k->parent->right) {
+                        k = k->parent;
+                        leftRotate(k);
+                    }
+                    k->parent->color = BLACK;
+                    k->parent->parent->color = RED;
+                    rightRotate(k->parent->parent);
+                }
+            }
+            if (k == root) {
+                break;
+            }
+        }
+        root->color = BLACK;
+    }
+
+    // 插入节点
+    void insert(int key) {
+        Node* node = new Node(key);
+        Node* y = nullptr;
+        Node* x = root;
+
+        while (x != TNULL) {
+            y = x;
+            if (node->data < x->data) {
+                x = x->left;
+            } else {
+                x = x->right;
+            }
+        }
+
+        node->parent = y;
+        if (y == nullptr) {
+            root = node;
+        } else if (node->data < y->data) {
+            y->left = node;
+        } else {
+            y->right = node;
+        }
+        node->left = TNULL;
+        node->right = TNULL;
+        node->color = RED;
+
+        fixInsert(node);
+    }
+
+    // 中序遍历
+    void inorderHelper(Node* root) {
+        if (root != TNULL) {
+            inorderHelper(root->left);
+            cout << root->data << " ";
+            inorderHelper(root->right);
+        }
+    }
+
+public:
+    RedBlackTree() {
+        TNULL = new Node(0);
+        TNULL->color = BLACK;
+        root = TNULL;
+    }
+
+    // 插入接口
+    void insertValue(int key) {
+        insert(key);
+    }
+
+    // 打印中序遍历
+    void inorder() {
+        inorderHelper(root);
+    }
+};
+
+int main() {
+    RedBlackTree tree;
+
+    tree.insertValue(55);
+    tree.insertValue(40);
+    tree.insertValue(65);
+    tree.insertValue(60);
+    tree.insertValue(50);
+    tree.insertValue(45);
+
+    cout << "Inorder traversal of the Red-Black Tree: ";
+    tree.inorder();
+    cout << endl;
+
+    return 0;
+}
+
+````
 
 
 
