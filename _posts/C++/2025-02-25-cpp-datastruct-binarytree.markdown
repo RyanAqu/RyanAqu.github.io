@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "C++ 二叉树"
+title:      "C++ 二叉树和搜索树"
 subtitle:   " \"learning……\""
 date:       2025-02-25 14:00:00
 author:     "Ryan"
@@ -8,7 +8,7 @@ header-img: "img/bg-walle.jpg"
 catalog: true
 tags:
     - c++
-    - 二叉树
+    - 二叉树和搜索树
     - 数据结构
 ---
 
