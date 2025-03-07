@@ -49,7 +49,7 @@ tags:
 # Linux 操作系统基础  
 [CSDN上一篇关于APUE/内核编程的优质文章](https://blog.csdn.net/weixin_36750623/article/details/127408987)  
 [Linux 下 Bash 命令基础](https://ryanaqu.github.io/2024/12/15/cpp-linux/)  
-[Linux 下 g++ 编译基础和Makefile](https://ryanaqu.github.io/2025/01/02/cpp-compile/)  
+[Linux 下 g++ 编译基础和Makefile](https://ryanaqu.github.io/2025/01/10/cpp-compile/)  
 [Linux 下 gdb 调试](https://ryanaqu.github.io/2025/01/10/cpp-gdb/)  
 [Linux 系统操作基础](https://ryanaqu.github.io/2025/01/10/cpp-linux-operate/)  
 [Linux 信号与进程](https://ryanaqu.github.io/2025/01/11/cpp-linux-signalprocess/)  
