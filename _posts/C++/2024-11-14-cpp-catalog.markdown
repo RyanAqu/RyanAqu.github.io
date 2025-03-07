@@ -39,11 +39,11 @@ tags:
 [回溯算法](https://ryanaqu.github.io/2025/01/07/cpp-algorithm-backtrack/)  
 
 ## 数据结构  
-[二叉树和搜索树](https://ryanaqu.github.io/2025/02/25/cpp-datastruct-binarytree/)  
-[堆和优先级队列](https://ryanaqu.github.io/2025/02/22/cpp-datastruct-heap/)  
-[并查集](https://ryanaqu.github.io/2025/02/22/cpp-datastruct-unionfind/)  
-[Trie前缀树](https://ryanaqu.github.io/2025/02/23/cpp-datastruct-trie/)  
-[LRU最近最少使用](https://ryanaqu.github.io/2025/02/24/cpp-datastruct-lru/)  
+[二叉树和搜索树](https://ryanaqu.github.io/2025/01/09/cpp-datastruct-binarytree/)  
+[堆和优先级队列](https://ryanaqu.github.io/2025/01/09/cpp-datastruct-heap/)  
+[并查集](https://ryanaqu.github.io/2025/01/09/cpp-datastruct-unionfind/)  
+[Trie前缀树](https://ryanaqu.github.io/2025/01/09/cpp-datastruct-trie/)  
+[LRU最近最少使用](https://ryanaqu.github.io/2025/01/09/cpp-datastruct-lru/)  
 [数据结构与基础算法](https://ryanaqu.github.io/2025/01/05/cpp-algorithm-datastructure/)  
 
 # Linux 操作系统基础  
