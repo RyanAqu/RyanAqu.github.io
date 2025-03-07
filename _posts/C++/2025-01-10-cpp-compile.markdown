@@ -2,7 +2,7 @@
 layout:     post
 title:      "g++ 编译细节、库制作和Makefile"
 subtitle:   " \"learning……\""
-date:       2025-01-02 17:16:00
+date:       2025-01-10 06:16:00
 author:     "Ryan"
 header-img: "img/bg-walle.jpg"
 catalog:    true
