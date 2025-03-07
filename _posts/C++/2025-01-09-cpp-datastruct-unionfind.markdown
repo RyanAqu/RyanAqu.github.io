@@ -2,7 +2,7 @@
 layout:     post
 title:      "C++ 并查集"
 subtitle:   " \"learning……\""
-date:       2025-02-22 14:11:00
+date:       2025-01-09 14:11:00
 author:     "Ryan"
 header-img: "img/bg-walle.jpg"
 catalog: true
