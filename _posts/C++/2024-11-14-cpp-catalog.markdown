@@ -121,12 +121,12 @@ fork了实验原始main分支，然后完成所有main下分支的lab，每一�
 [Xv6操作系统个人实验代码仓库（更新中...）](https://github.com/RyanAqu/MIT6.S081-2020-labs)  
 
 [Lab1：Makefile、基本系统调用、多进程编程、文件描述符、IPC管道、sleep、find、pingpong、primes、xargs](https://github.com/RyanAqu/MIT6.S081-2020-labs/tree/util_test)  
-总结：学习了一些操作系统接口，用系统调用编写了一些实用程序。  
+总结：学习了一些操作系统接口，用系统调用编写了一些实用的用户级程序。  
 
 [Lab2：系统资源抽象（CPU抽象（线程、调度器）、内存抽象（虚拟内存、分页）、存储抽象（文件系统、块设备）、I/O抽象（设备驱动）、网络抽象（socket、VPN、SDN））；强隔离性（内核态用户态M/S/U）；内核组织（微内核、宏内核、混合内核、客户/服务器模式）；Xv6架构（模块化内核）；Xv6进程管理和隔离机制（进程抽象（独立地址空间、时间片、IPC、并发）、进程状态（运行、就绪、阻塞、等待、退出）、进程信息（页表、内核、寄存器状态））;trace、sysinfo](https://github.com/RyanAqu/MIT6.S081-2020-labs/tree/syscall_test)  
 总结：学习了操作系统架构和进程，学习了系统调用是怎么进入的 ~~（usys.pl脚本使用entry函数自动生成汇编（交叉编译？），譬如fork会通过entry中的li a7, SYS_fork语句把 SYS_fork（即 fork 的系统调用号）加载到 a7 寄存器）~~ ~~（user.h暴露系统调用的接口，usy.pl将系统调用变成汇编并转到特定寄存器）~~，向xv6添加了一些新的系统调用，扩展了Xv6操作系统。  
 
-
+[Lab3：内存映射（虚拟地址、物理地址、页内偏移、分页硬件）；内存管理MMU（进程页表、用户地址空间、内核地址空间、进程空间的独立性）]() 
 
 
 
