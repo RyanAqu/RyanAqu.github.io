@@ -13,6 +13,8 @@ tags:
 
 > 不要抱怨，抱我。
 
+# MySql底层原理学习链接  
+[MySql底层原理学习链接](https://www.bilibili.com/video/BV1gvQJYGEyt?spm_id_from=333.788.videopod.episodes&vd_source=49af47b5aebdd3ef8f9a960aa6aa3519&p=13)  
 
 # MySql简介  
 MySQL 是一种开源的关系型数据库管理系统（RDBMS），它使用结构化查询语言（SQL）进行数据存储和管理。MySQL 是由 MySQL AB 开发的，后来被 Sun Microsystems（现为 Oracle Corporation）收购。由于其高效性、稳定性和广泛的社区支持，MySQL 已经成为世界上最流行的数据库之一。  
