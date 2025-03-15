@@ -104,6 +104,9 @@ TCP 四次挥手用于断开连接，确保双方都能安全地关闭通信。�
 * Nagle算法和延迟确认的结合可能导致糟糕的延迟现象（“延迟病”），尤其是在交互应用中。
 
 
+# HTTPS  
+### SSL/TLS握手  
+![image](https://github.com/user-attachments/assets/7fe424f0-a51f-40c6-96b1-43953d2ea55c)  
 
 
 
