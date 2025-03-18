@@ -209,6 +209,45 @@ public:
 };
 ````
 
+# 基数排序  
+````
+class Solution {
+public:
+    void sortColors(vector<int>& nums) {
+        //基数排序,得到桶使用次数
+        int absmax=0;
+        for(int num:nums)
+        {
+            absmax = abs(num)>absmax?abs(num):absmax;
+        }
+        int len=to_string(absmax).size();
+
+        //开始排序
+        vector<vector<int>> bucket;
+        int mod=10,dev=1;
+        for(int i=0;i<len;i++,dev*=10,mod*=10)
+        {
+            
+            bucket.resize(20);
+            for(int j=0;j<nums.size();j++)
+            {
+                int index=(nums[j]%mod)/dev+10;
+                bucket[index].push_back(nums[j]);
+            }
+            int idx=0;
+            for(auto vec:bucket)
+            {
+                for(int num:vec)
+                {
+                    nums[idx++] = num;
+                }
+            }
+            bucket.clear();
+        }
+    }
+};
+````
+
 # 练习  
 215  
 347  
