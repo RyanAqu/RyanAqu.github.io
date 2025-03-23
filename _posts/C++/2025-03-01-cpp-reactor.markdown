@@ -460,7 +460,7 @@ int main(int argc,char* argv[])
 ````
 
 
-# 增加InetAddress类  
+# 封装InetAddress类  
 ### 头文件  
 ````
 #pragma once
@@ -475,6 +475,7 @@ class InetAddress
 private:
     sockaddr_in addr_;      //表示地址协议的结构体
 public:
+    InetAddress();
     InetAddress(const std::string &ip,uint16_t port);//如果是监听的fd，用这个构造函数
     InetAddress(const sockaddr_in addr);//如果是客户端连上来的fd，用这个构造函数
     
@@ -483,7 +484,7 @@ public:
     const char*ip() const;  //返回字符串表示的IP地址，例如192.168.216.128
     uint16_t port() const;  //返回整数表示的端口，例如80、8080
     const sockaddr*addr() const;//返回addr_成员的地址，转换成了sockaddr类型
-    
+    void setaddr(sockaddr_in clientaddr); //设置addr_成员的值
 };
 ````
 
@@ -497,6 +498,7 @@ class InetAddress
 private:
     sockaddr_in addr_;      //表示地址协议的结构体
 public:
+    InetAddress();
     InetAddress(const std::string &ip,uint16_t port);//如果是监听的fd，用这个构造函数
     InetAddress(const sockaddr_in addr):addr_(addr){}//如果是客户端连上来的fd，用这个构造函数
     ~InetAddress();
@@ -504,9 +506,13 @@ public:
     const char*ip() const;  //返回字符串表示的IP地址，例如192.168.216.128
     uint16_t port() const;  //返回整数表示的端口，例如80、8080
     const sockaddr*addr() const;//返回addr_成员的地址，转换成了sockaddr类型
-    
+    void setaddr(sockaddr_in clientaddr); //设置addr_成员的值
 };
 */
+InetAddress::InetAddress()
+{
+    
+}
 InetAddress::InetAddress(const std::string &ip,uint16_t port)//如果是监听的fd，用这个构造函数
 {
     addr_.sin_family=AF_INET;//ipv4网络套接字
@@ -535,6 +541,11 @@ const sockaddr* InetAddress::addr() const//返回addr_成员的地址，转换�
 {
     return (sockaddr*)&addr_;
 }
+void InetAddress::setaddr(sockaddr_in clientaddr) //设置addr_成员的值
+{
+    addr_=clientaddr;
+}
+
 
 ````
 ### Makefile
@@ -728,17 +739,337 @@ int main(int argc,char* argv[])
 }
 ````
 
+# 封装socket类  
+### 头文件  
+````
+#pragma once
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/tcp.h>
+#include <string.h>
+#include <errno.h>
+#include <unistd.h>
+#include "InetAddress.h"
+
+//创建一个非阻塞的socket
+int createnonblocking();
+
+//socekt 类
+class Socket
+{
+private:
+    const int fd_;  //Socket持有的fd，在构造函数中传进来
+public:
+    Socket(int fd); //构造函数，传入一个已经准备好的fd
+    ~Socket();      //在析构函数中，关闭fd_
+
+    int fd() const; //返回fd成员
+    void setreuseaddr(bool on);  //设置SO_REUSEADDR选项，true打开，false关闭
+    void setreuseport(bool on);  //设置SO_REUSEPORT选项
+    void settcpnodelay(bool on); //设置TCP_NODELAY选项
+    void setkeepalive(bool on);  //设置SO_KEEPALIVE选项
+    void bind(const InetAddress& servaddr); //服务端的socket将调用此函数
+    void listen(int nn=128);                //服务端的socket将调用此函数
+    int accept(InetAddress& clientaddr);   //服务端的socket将调用此函数
+};
+````
+
+
+### 源文件  
+````
+#include "Socket.h"
+//创建一个非阻塞的socket
+int createnonblocking()
+{
+    //创建服务端用于监听的端口
+    int listenfd=socket(AF_INET,SOCK_STREAM|SOCK_NONBLOCK,IPPROTO_TCP);//加一个SOCK_NONBLOCK就是非阻塞IO
+    if(listenfd<0)
+    {
+        printf("%s:%s:%d listen socket create error:%d\n",__FILE__,__FUNCTION__,__LINE__,errno);
+        exit(-1);
+    }
+    return listenfd;
+}
+
+//构造函数，传入一个已经准备好的fd
+Socket::Socket(int fd):fd_(fd)
+{
+
+}
+
+//在析构函数中，关闭fd_
+Socket::~Socket()      
+{
+    ::close(fd_);
+}
+
+
+//返回fd成员
+int Socket::fd() const
+{
+    return fd_;
+} 
+
+
+//设置SO_REUSEADDR选项，true打开，false关闭
+void Socket::setreuseaddr(bool on)
+{
+    int optval = on?1:0;
+    ::setsockopt(fd_,SOL_SOCKET,SO_REUSEADDR,&optval,sizeof(optval));
+}
+
+void Socket::setreuseport(bool on)  //设置SO_REUSEPORT选项
+{
+    int optval = on?1:0;
+    ::setsockopt(fd_,SOL_SOCKET,SO_REUSEPORT,&optval,sizeof(optval));
+}
+
+void Socket::settcpnodelay(bool on) //设置TCP_NODELAY选项
+{
+    int optval = on?1:0;
+    ::setsockopt(fd_,IPPROTO_TCP,TCP_NODELAY,&optval,sizeof(optval));
+}
 
 
 
+void Socket::setkeepalive(bool on)  //设置SO_KEEPALIVE选项
+{
+    int optval = on?1:0;
+    ::setsockopt(fd_,SOL_SOCKET,SO_KEEPALIVE,&optval,sizeof(optval));    
+}
+
+void Socket::bind(const InetAddress& servaddr) //服务端的socket将调用此函数
+{
+    if(::bind(fd_,servaddr.addr(),sizeof(sockaddr))<0)
+    {
+        perror("bind() failed");
+        close(fd_);
+        exit(-1);
+    }
+}
 
 
+void Socket::listen(int nn)                //服务端的socket将调用此函数
+{
+    if(::listen(fd_,nn)!=0)//在高并发服务其中，第二个参数要大一些
+    {
+        perror("listen() failed");
+        close(fd_);
+        exit(-1);
+    }
+}
+
+int Socket::accept(InetAddress& clientaddr)   //服务端的socket将调用此函数
+{
+    sockaddr_in peeraddr;
+    socklen_t len=sizeof(peeraddr);
+    int clientfd=accept4(fd_,(sockaddr*)&peeraddr,&len,SOCK_NONBLOCK);
+    
+    clientaddr.setaddr(peeraddr);
+
+    return clientfd;
+
+}
+
+````
+
+### Makefile  
+````
+all:client tcpepoll
+
+client:client.cpp
+	g++ -g client.cpp -o client
+
+tcpepoll:tcpepoll.cpp InetAddress.cpp Socket.cpp
+	g++ -g tcpepoll.cpp InetAddress.cpp Socket.cpp -o tcpepoll
+
+clean:
+	rm -f client tcpepoll
+````
+
+### 修改服务端  
+````
+/*
+ *此程序用于演示epoll模型实现网络通信服务端
+ */
+#include<stdio.h>
+#include<unistd.h>
+#include<stdlib.h>
+#include<string.h>
+#include<errno.h>
+#include<sys/socket.h>
+#include<sys/types.h>
+#include<arpa/inet.h>
+#include<sys/fcntl.h>
+#include<sys/epoll.h>
+#include<netinet/tcp.h>// TCP_NODELAY需要包含这个头文件
+//TCP_NODELAY用于禁用Nagle算法
+#include"InetAddress.h"
+#include"Socket.h"
+
+int main(int argc,char* argv[])
+{
+    
+    if(argc!=3)
+    {
+        printf("usage: ./tcpepoll ip port\n");
+        printf("example: ./tcpepoll 192.168.157.128 5005\n");
+        return -1;
+    }
+
+    /*
+    //创建服务端用于监听的端口
+    int listenfd=socket(AF_INET,SOCK_STREAM|SOCK_NONBLOCK,IPPROTO_TCP);//加一个SOCK_NONBLOCK就是非阻塞IO
+    if(listenfd<0)
+    {
+        perror("socket() failed");
+        return -1;
+    }
+
+    //设置listenfd的属性
+    int opt=1;
+    setsockopt(listenfd,SOL_SOCKET,SO_REUSEADDR,&opt,static_cast<socklen_t>(sizeof opt));
+    setsockopt(listenfd,SOL_SOCKET,TCP_NODELAY,&opt,static_cast<socklen_t>(sizeof opt));
+    setsockopt(listenfd,SOL_SOCKET,SO_REUSEPORT,&opt,static_cast<socklen_t>(sizeof opt));
+    setsockopt(listenfd,SOL_SOCKET,SO_KEEPALIVE,&opt,static_cast<socklen_t>(sizeof opt));
+
+    InetAddress servaddr(argv[1],atoi(argv[2]));
+
+    if(bind(listenfd,servaddr.addr(),sizeof(sockaddr))<0)
+    {
+        perror("bind() failed");
+        close(listenfd);
+        return -1;
+    }
+    
+    if(listen(listenfd,128)!=0)//在高并发服务其中，第二个参数要大一些
+    {
+        perror("listen() failed");
+        close(listenfd);
+        return -1;
+    }
+    */
+    Socket servsock(createnonblocking());
+    InetAddress servaddr(argv[1],atoi(argv[2]));
+    servsock.setreuseaddr(true);
+    servsock.settcpnodelay(true);
+    servsock.setreuseport(true);
+    servsock.setkeepalive(true);
+    servsock.bind(servaddr);
+    servsock.listen();
 
 
+    int epollfd = epoll_create(1);//创建epoll句柄（红黑树）
 
+    //为服务端的listenfd准备读事件
 
+    //为服务端的listensock准备可读事件。
+    epoll_event ev;     //申明事件的数据结构
+    ev.data.fd=servsock.fd();//指定事件的自定义数据，会随着epoll_wait()返回的事件一并返回
+    ev.events=EPOLLIN;  //打算让epoll监视listensock的读事件,采用水平触发
 
+    epoll_ctl(epollfd,EPOLL_CTL_ADD,servsock.fd(),&ev); //把需要监视的socket加入epollfd中。
+    
+    epoll_event evs[10];//存放epoll返回的事件。
+    
+    
+    while(1)//事件循环
+    {
+        //等待监视的socket有事件发生
+        int infds = epoll_wait(epollfd,evs,10,-1);
 
+        
+        //返回失败
+        if(infds<0)
+        {
+            perror("epoll() failed\n");break;
+        }
+        //超时
+        if(infds==0)
+        {
+            printf("epoll() timeout.\n");
+            continue;
+        }
+        //如果infds>0,表示有事件发生的socket的数量
+        for(int i=0;i<infds;i++)
+        {
+            //如果客户端连接的sock有事件，表示有报文发过来或者链接已经断开
+            //////////////////////////////
+            if(evs[i].events&EPOLLRDHUP)//对方已经关闭连接，有些系统检测不到，可以使用EPOLLIN，recv()返回
+            {
+                //如果客户端已经断开
+                printf("client(eventfd=%d)disconnected.\n",evs[i].data.fd);
+                close(evs[i].data.fd);//关闭客户端的fd
+            }
+            else if(evs[i].events&(EPOLLIN|EPOLLPRI))//接受区有数据可以读
+            {
+                //如果发生事件的是listensock，表示有新的客户端连上来
+                if(evs[i].data.fd==servsock.fd())
+                {
+                    //sockaddr_in peeraddr;
+                    //socklen_t len=sizeof(peeraddr);
+                    //int clientfd=accept4(listenfd,(sockaddr*)&peeraddr,&len,SOCK_NONBLOCK);
+                    
+                    InetAddress clientaddr;
+                    Socket* clientsock=new Socket(servsock.accept(clientaddr));
+
+                    printf("accept client(fd=%d,ip=%s,port=%d)ok.\n",clientsock->fd(),clientaddr.ip(),clientaddr.port());
+
+                    //为新客户准备可读事件，并添加到epoll中
+                    ev.data.fd=clientsock->fd();
+                    ev.events=EPOLLIN|EPOLLET;//边缘触发
+                    epoll_ctl(epollfd,EPOLL_CTL_ADD,clientsock->fd(),&ev);
+                }
+                else
+                {
+                    char buffer[1024];//存放从客户端读取的数据
+                    while(true)//使用非阻塞IO，一次读取buffer大小数据，直到全部读取完
+                    {
+                        bzero(&buffer,sizeof(buffer));
+                        ssize_t nread = read(evs[i].data.fd,buffer,sizeof(buffer));
+                        if(nread>0)//成功读取到了数据
+                        {
+                            //把接收到的数据原封不动的返回回去
+                            printf("recv(eventfd=%d);%s\n",evs[i].data.fd,buffer);
+                            send(evs[i].data.fd,buffer,strlen(buffer),0);
+                        }
+                        else if(nread==-1&&errno==EINTR)//读取数据的时候信号中断，继续读取
+                        {
+                            continue;
+                        }
+                        else if(nread==-1&&((errno==EAGAIN)||(errno==EWOULDBLOCK)))//全部的数据已读取完必
+                        {
+                            break;
+                        }
+                        else if(nread==0)//客户端连接已经断开
+                        {
+                            printf("client(eventfd=%d) disconnected.\n",evs[i].data.fd);
+                            close(evs[i].data.fd);
+                            break;
+                        }
+                    }
+                }
+                
+            }
+            else if(evs[i].events&EPOLLOUT)//有数据要写，暂时没代码，以后在说
+            {
+
+            }
+            else //其他事件，都视为错误,或者对方关闭了链接。
+            {
+                printf("client(eventfd=%d)error.\n",evs[i].data.fd);
+                close(evs[i].data.fd);
+            }
+            /////////////////////////////
+                
+        }
+    }
+    return 0;
+}
+````
+
+# 封装epoll类  
+### 
 
 
 
