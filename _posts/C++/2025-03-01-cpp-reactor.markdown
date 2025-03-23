@@ -1309,7 +1309,208 @@ typedef union epoll_data {
 
 之前用的都是fd，在reactor模型中要用void* ptr。
 
-### 
+### 用ptr的服务端demo  
+````
+/*
+ *此程序用于演示epoll模型实现网络通信服务端
+ */
+#include<stdio.h>
+#include<unistd.h>
+#include<stdlib.h>
+#include<string.h>
+#include<errno.h>
+#include<sys/socket.h>
+#include<sys/types.h>
+#include<arpa/inet.h>
+#include<sys/fcntl.h>
+#include<sys/epoll.h>
+#include<netinet/tcp.h>// TCP_NODELAY需要包含这个头文件
+//TCP_NODELAY用于禁用Nagle算法
+
+class Channel
+{
+private:
+    int fd_;
+    bool islisten_=false;//true表示监听的fd，false表示客户端连上来的fd
+    //.....
+public:
+    Channel(int fd,bool islisten=false):fd_(fd),islisten_(islisten)
+    {
+
+    }
+    int fd()
+    {
+        return fd_;
+    }
+    bool islisten()
+    {
+        return islisten_;
+    }
+    //.....
+};
+
+//设置非阻塞的IO
+void setnonblocking(int fd)
+{
+    fcntl(fd,F_SETFL,fcntl(fd,F_GETFL)|O_NONBLOCK);
+}
+
+int main(int argc,char* argv[])
+{
+    
+    if(argc!=3)
+    {
+        printf("usage: ./tcpepoll ip port\n");
+        printf("example: ./tcpepoll 192.168.157.128 5005\n");
+        return -1;
+    }
+
+
+    //创建服务端用于监听的端口
+    int listenfd=socket(AF_INET,SOCK_STREAM,IPPROTO_TCP);
+    if(listenfd<0)
+    {
+        perror("socket() failed");
+        return -1;
+    }
+
+    //设置listenfd的属性
+    int opt=1;
+    setsockopt(listenfd,SOL_SOCKET,SO_REUSEADDR,&opt,static_cast<socklen_t>(sizeof opt));
+    setsockopt(listenfd,SOL_SOCKET,TCP_NODELAY,&opt,static_cast<socklen_t>(sizeof opt));
+    setsockopt(listenfd,SOL_SOCKET,SO_REUSEPORT,&opt,static_cast<socklen_t>(sizeof opt));
+    setsockopt(listenfd,SOL_SOCKET,SO_KEEPALIVE,&opt,static_cast<socklen_t>(sizeof opt));
+
+    setnonblocking(listenfd);//把服务端的listenfd设置为非阻塞的
+
+    struct sockaddr_in servaddr;//服务端地址结构体
+    servaddr.sin_family=AF_INET;//ipv4网络套接字
+    servaddr.sin_addr.s_addr = inet_addr(argv[1]);//服务端用于监听的ip地址
+    servaddr.sin_port=htons(atoi(argv[2]));//服务端用于监听的端口
+
+
+    if(bind(listenfd,(struct sockaddr*)&servaddr,sizeof(servaddr))<0)
+    {
+        perror("bind() failed");
+        close(listenfd);
+        return -1;
+    }
+    
+    if(listen(listenfd,128)!=0)//在高并发服务其中，第二个参数要大一些
+    {
+        perror("listen() failed");
+        close(listenfd);
+        return -1;
+    }
+    int epollfd = epoll_create(1);//创建epoll句柄（红黑树）
+
+    Channel* servchannel=new Channel(listenfd,true);
+    //为服务端的listenfd准备读事件
+
+    //为服务端的listensock准备可读事件。
+    struct epoll_event ev;     //申明事件的数据结构
+    ev.data.ptr=servchannel;//指定事件的自定义数据，会随着epoll_wait()返回的事件一并返回
+    ev.events=EPOLLIN;  //打算让epoll监视listensock的读事件,采用水平触发
+
+    epoll_ctl(epollfd,EPOLL_CTL_ADD,listenfd,&ev); //把需要监视的socket加入epollfd中。
+    
+    struct epoll_event evs[10];//存放epoll返回的事件。
+    
+    
+    while(1)//事件循环
+    {
+        //等待监视的socket有事件发生
+        int infds = epoll_wait(epollfd,evs,10,-1);
+
+        
+        //返回失败
+        if(infds<0)
+        {
+            perror("epoll() failed\n");break;
+        }
+        //超时
+        if(infds==0)
+        {
+            printf("epoll() timeout.\n");
+            continue;
+        }
+        //如果infds>0,表示有事件发生的socket的数量
+        for(int i=0;i<infds;i++)
+        {
+            Channel* ch=(Channel*)evs[i].data.ptr;
+            //如果发生事件的是listensock，表示有新的客户端连上来
+            if(ch->islisten()==true)
+            {
+                struct sockaddr_in clientaddr;
+                socklen_t len=sizeof(clientaddr);
+                int clientfd=accept(listenfd,(struct sockaddr*)&clientaddr,&len);
+                setnonblocking(clientfd);//客户端连接的fd必须设置为非阻塞的
+                
+                printf("accept client(fd=%d,ip=%s,port=%d)ok.\n",clientfd,inet_ntoa(clientaddr.sin_addr),ntohs(clientaddr.sin_port));
+
+                //为新客户准备可读事件，并添加到epoll中
+                Channel*clientchannel=new Channel(clientfd);
+                ev.data.ptr=clientchannel;
+                ev.events=EPOLLIN|EPOLLET;//边缘触发
+                epoll_ctl(epollfd,EPOLL_CTL_ADD,clientfd,&ev);
+            }
+            else
+            {
+                //如果客户端连接的sock有事件，表示有报文发过来或者链接已经断开
+                //////////////////////////////
+                if(evs[i].events&EPOLLRDHUP)//对方已经关闭连接，有些系统检测不到，可以使用EPOLLIN，recv()返回
+                {
+                    //如果客户端已经断开
+                    printf("client(eventfd=%d)disconnected.\n",ch->fd());
+                    close(ch->fd());//关闭客户端的fd
+                }
+                else if(evs[i].events&(EPOLLIN|EPOLLPRI))//接受区有数据可以读
+                {
+                    char buffer[1024];//存放从客户端读取的数据
+                    while(true)//使用非阻塞IO，一次读取buffer大小数据，直到全部读取完
+                    {
+                        bzero(&buffer,sizeof(buffer));
+                        ssize_t nread = read(ch->fd(),buffer,sizeof(buffer));
+                        if(nread>0)//成功读取到了数据
+                        {
+                            //把接收到的数据原封不动的返回回去
+                            printf("recv(eventfd=%d);%s\n",ch->fd(),buffer);
+                            send(ch->fd(),buffer,strlen(buffer),0);
+                        }
+                        else if(nread==-1&&errno==EINTR)//读取数据的时候信号中断，继续读取
+                        {
+                            continue;
+                        }
+                        else if(nread==-1&&((errno==EAGAIN)||(errno==EWOULDBLOCK)))//全部的数据已读取完必
+                        {
+                            break;
+                        }
+                        else if(nread==0)//客户端连接已经断开
+                        {
+                            printf("client(eventfd=%d) disconnected.\n",ch->fd());
+                            close(ch->fd());
+                            break;
+                        }
+                    }
+                }
+                else if(evs[i].events&EPOLLOUT)//有数据要写，暂时没代码，以后在说
+                {
+
+                }
+                else //其他事件，都视为错误,或者对方关闭了链接。
+                {
+                    printf("client(eventfd=%d)error.\n",ch->fd());
+                    close(ch->fd());
+                }
+                /////////////////////////////
+                
+            }
+        }
+    }
+
+    return 0;
+}
+````
 
 
 
