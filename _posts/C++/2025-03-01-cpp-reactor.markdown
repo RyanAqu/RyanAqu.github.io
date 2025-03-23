@@ -1069,16 +1069,224 @@ int main(int argc,char* argv[])
 ````
 
 # 封装epoll类  
-### 头文件
+### 头文件  
+````
+#pragma once
+#include<stdio.h>
+#include<stdlib.h>
+#include<errno.h>
+#include<strings.h>
+#include<string.h>
+#include<sys/epoll.h>
+#include<vector>
+#include<unistd.h>
+
+//Epoll类
+class Epoll
+{
+private:
+    static const int MaxEvents=100;//epoll_wait()返回事件数组的大小
+    int epollfd_ = -1;//epoll句柄，在构造函数中创建
+    epoll_event events_[MaxEvents];//存放epoll返回的事件。
+public:
+    Epoll();        //构造函数创建epollfd_
+    ~Epoll();       //析构函数关闭epollfd_
+    void addfd(int fd,uint32_t op); //把fd和他需要监视的事件添加到红黑树上
+    std::vector<epoll_event> loop(int timeout=-1);//运行epoll_wait()，等待事件的发生，已发生的事件用vector容器返回
+};
 ````
 
+### 源文件  
+````
+#include"Epoll.h"
+
+Epoll::Epoll()        //构造函数创建epollfd_
+{
+    if((epollfd_ = epoll_create(1))==-1) //创建epoll句柄（红黑树）
+    {
+        printf("epoll_create() failed(%d).\n",errno);
+        exit(-1);
+    }
+
+}
+Epoll::~Epoll()      //析构函数关闭epollfd_
+{
+    close(epollfd_);
+}
+void Epoll::addfd(int fd,uint32_t op) //把fd和他需要监视的事件添加到红黑树上
+{
+    epoll_event ev;     //申明事件的数据结构
+    ev.data.fd=fd;//指定事件的自定义数据，会随着epoll_wait()返回的事件一并返回
+    ev.events=op;  //
+    if(epoll_ctl(epollfd_,EPOLL_CTL_ADD,fd,&ev)==-1) //把需要监视的socket加入epollfd中。
+    {
+        printf("epoll_ctl() failed(%d).\n",errno);
+        exit(-1);
+    }
+}
+std::vector<epoll_event> Epoll::loop(int timeout)//运行epoll_wait()，等待事件的发生，已发生的事件用vector容器返回
+{
+    std::vector<epoll_event> evs;//存放返回的epoll_wait()事件
+    bzero(events_,sizeof(events_));
+    
+    //等待监视的socket有事件发生
+    int infds = epoll_wait(epollfd_,events_,MaxEvents,timeout);
+
+    
+    //返回失败
+    if(infds<0)
+    {
+        perror("epoll() failed\n");exit(-1);
+    }
+    //超时
+    if(infds==0)
+    {
+        printf("epoll() timeout.\n");
+        return evs;
+    }
+    //如果infds>0,表示有事件发生的socket的数量
+    for(int i=0;i<infds;i++)
+    {
+        evs.push_back(events_[i]);
+    }
+    return evs;
+}
 ````
 
-### 源文件
+### Makefile  
+````
+all:client tcpepoll
 
-### Makefile
+client:client.cpp
+	g++ -g client.cpp -o client
 
-### 修改服务端
+tcpepoll:tcpepoll.cpp InetAddress.cpp Socket.cpp Epoll.cpp
+	g++ -g tcpepoll.cpp InetAddress.cpp Socket.cpp Epoll.cpp -o tcpepoll
+
+clean:
+	rm -f client tcpepoll
+````
+
+### 修改服务端  
+````
+/*
+ *此程序用于演示epoll模型实现网络通信服务端
+ */
+#include<stdio.h>
+#include<unistd.h>
+#include<stdlib.h>
+#include<string.h>
+#include<errno.h>
+#include<sys/socket.h>
+#include<sys/types.h>
+#include<arpa/inet.h>
+#include<sys/fcntl.h>
+#include<sys/epoll.h>
+#include<netinet/tcp.h>// TCP_NODELAY需要包含这个头文件
+#include"InetAddress.h"//TCP_NODELAY用于禁用Nagle算法
+#include"Socket.h"
+#include"Epoll.h"
+
+int main(int argc,char* argv[])
+{
+    
+    if(argc!=3)
+    {
+        printf("usage: ./tcpepoll ip port\n");
+        printf("example: ./tcpepoll 192.168.157.128 5005\n");
+        return -1;
+    }
+
+    Socket servsock(createnonblocking());
+    InetAddress servaddr(argv[1],atoi(argv[2]));
+    servsock.setreuseaddr(true);
+    servsock.settcpnodelay(true);
+    servsock.setreuseport(true);
+    servsock.setkeepalive(true);
+    servsock.bind(servaddr);
+    servsock.listen();
+
+    Epoll ep;
+    ep.addfd(servsock.fd(),EPOLLIN);//水平触发，监听listenfd的读事件
+    std::vector<epoll_event>evs;//存放epoll_wait()返回事件。
+
+    while(1)//事件循环
+    {
+        evs=ep.loop();  //等待监视的fd有事件发生
+
+        //如果infds>0,表示有事件发生的socket的数量
+        for(auto& ev:evs)
+        {
+            //如果客户端连接的sock有事件，表示有报文发过来或者链接已经断开
+            //////////////////////////////
+            if(ev.events&EPOLLRDHUP)//对方已经关闭连接，有些系统检测不到，可以使用EPOLLIN，recv()返回
+            {
+                //如果客户端已经断开
+                printf("client(eventfd=%d)disconnected.\n",ev.data.fd);
+                close(ev.data.fd);//关闭客户端的fd
+            }
+            else if(ev.events&(EPOLLIN|EPOLLPRI))//接受区有数据可以读
+            {
+                //如果发生事件的是listensock，表示有新的客户端连上来
+                if(ev.data.fd==servsock.fd())
+                {
+                           
+                    InetAddress clientaddr;
+                    Socket* clientsock=new Socket(servsock.accept(clientaddr));
+
+                    printf("accept client(fd=%d,ip=%s,port=%d)ok.\n",clientsock->fd(),clientaddr.ip(),clientaddr.port());
+
+                    //为新客户准备可读事件，并添加到epoll中
+                    ep.addfd(clientsock->fd(),EPOLLIN|EPOLLET);   //客户端采用边缘触发
+                    
+                }
+                else
+                {
+                    char buffer[1024];//存放从客户端读取的数据
+                    while(true)//使用非阻塞IO，一次读取buffer大小数据，直到全部读取完
+                    {
+                        bzero(&buffer,sizeof(buffer));
+                        ssize_t nread = read(ev.data.fd,buffer,sizeof(buffer));
+                        if(nread>0)//成功读取到了数据
+                        {
+                            //把接收到的数据原封不动的返回回去
+                            printf("recv(eventfd=%d);%s\n",ev.data.fd,buffer);
+                            send(ev.data.fd,buffer,strlen(buffer),0);
+                        }
+                        else if(nread==-1&&errno==EINTR)//读取数据的时候信号中断，继续读取
+                        {
+                            continue;
+                        }
+                        else if(nread==-1&&((errno==EAGAIN)||(errno==EWOULDBLOCK)))//全部的数据已读取完必
+                        {
+                            break;
+                        }
+                        else if(nread==0)//客户端连接已经断开
+                        {
+                            printf("client(eventfd=%d) disconnected.\n",ev.data.fd);
+                            close(ev.data.fd);
+                            break;
+                        }
+                    }
+                }
+                
+            }
+            else if(ev.events&EPOLLOUT)//有数据要写，暂时没代码，以后在说
+            {
+
+            }
+            else //其他事件，都视为错误,或者对方关闭了链接。
+            {
+                printf("client(eventfd=%d)error.\n",ev.data.fd);
+                close(ev.data.fd);
+            }
+            /////////////////////////////
+                
+        }
+    }
+    return 0;
+}
+````
 
 
 
