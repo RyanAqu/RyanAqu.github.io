@@ -1288,7 +1288,7 @@ int main(int argc,char* argv[])
 }
 ````
 
-# Channel  
+# 封装Channel类  
 ### epoll结构体  
 epoll 是 Linux 中用于高效 I/O 事件通知的机制，特别适合处理大量文件描述符（如网络套接字）。它的核心是三个系统调用：epoll_create、epoll_ctl 和 epoll_wait，以及一个关键的数据结构 struct epoll_event。  
 ````
@@ -1511,6 +1511,33 @@ int main(int argc,char* argv[])
     return 0;
 }
 ````
+
+### 头文件    
+````
+
+````
+
+
+### 源文件    
+````
+
+````
+
+### Makefile   
+````
+
+````
+
+
+### 修改服务端   
+````
+
+````
+
+
+
+
+
 
 
 
