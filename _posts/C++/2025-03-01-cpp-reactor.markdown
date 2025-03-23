@@ -1307,6 +1307,8 @@ typedef union epoll_data {
 } epoll_data_t;
 ````
 
+之前用的都是fd，在reactor模型中要用void* ptr。
+
 ### 
 
 
