@@ -1288,7 +1288,26 @@ int main(int argc,char* argv[])
 }
 ````
 
+# Channel  
+### epoll结构体  
+epoll 是 Linux 中用于高效 I/O 事件通知的机制，特别适合处理大量文件描述符（如网络套接字）。它的核心是三个系统调用：epoll_create、epoll_ctl 和 epoll_wait，以及一个关键的数据结构 struct epoll_event。  
+````
+#include <sys/epoll.h>
 
+struct epoll_event {
+    uint32_t     events;  // 需要监听的事件类型
+    epoll_data_t data;    // 用户数据，通常用于存储文件描述符或指针
+};
+
+typedef union epoll_data {
+    void* ptr;  // 可以存储任意指针
+    int fd;     // 通常用于存储文件描述符
+    uint32_t u32;
+    uint64_t u64;
+} epoll_data_t;
+````
+
+### 
 
 
 
