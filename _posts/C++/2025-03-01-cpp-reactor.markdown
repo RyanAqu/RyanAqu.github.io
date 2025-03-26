@@ -1859,10 +1859,218 @@ int main(int argc,char* argv[])
 
 ````
 
-# 优化Channel类
+# 优化Channel类  
+### 优化Channel头文件  
+````
+#pragma once
+#include<sys/epoll.h>
+#include"Epoll.h"
+#include"InetAddress.h"
+#include"Socket.h"
+
+class Epoll;
+
+class Channel
+{
+private:
+    int fd_=-1;        //channel和fd是一对一的关系
+    Epoll * ep_=nullptr;//channel和epoll是一对一的关系,一个channel只在一个红黑树上
+    bool inepoll_=false;//标记channel是否已经添加到epoll树上，如果未添加，调用epoll_ctl()的时候用EPOLL_CTL_ADD，否则用EPOLL_CTL_MOD
+    uint32_t events_=0;//fd需要监视的事件，listenfd和clientfd需要监视EPOLLIN，clientfd还要监视EPOLLOUT
+    uint32_t revents_=0;//存放fd已发生的事件
+    bool islisten_=false;//如果为listenfd，取值为true，客户端连上来的fd为false
+public:
+    Channel(Epoll* ep,int fd,bool islisten);
+    ~Channel();
+
+    int fd();           //返回fd_成员
+    void useet();        //采用边缘触发
+    void enablereading();//让epoll_wait()监视fd_的读事件
+    void setinepoll();  //把inepoll_成员的值设置为true
+    void setrevents(uint32_t ev);//设置revents_成员的值为参数ev
+    bool inpoll();      //返回inepoll_成员的值
+    uint32_t events();  //返回events_成员的值
+    uint32_t revents();  //返回revents_成员的值
+
+    void handleevent(Socket *servsock); //事件处理函数，epoll_wait()返回的时候，执行它
+};
+````
+
+### 优化Channel源文件  
+````
+#include"Channel.h"
+
+Channel::Channel(Epoll* ep,int fd,bool islisten):ep_(ep),fd_(fd),islisten_(islisten)
+{
+
+}
+
+Channel::~Channel()
+{
+    //在析构函数中不要销毁ep_，也不能关闭fd_，因为这两个不属于Channel类，channel类只是需要他们，使用他们而已
+}
+
+int Channel::fd()           //返回fd_成员
+{
+    return fd_;
+}
+void Channel::useet()        //采用边缘触发
+{
+    events_=events_|EPOLLET;
+}
+void Channel::enablereading()//让epoll_wait()监视fd_的读事件
+{
+    events_=events_|EPOLLIN;
+    ep_->updatechannel(this);
+}
+void Channel::setinepoll()  //把inepoll_成员的值设置为true
+{
+    inepoll_=true;
+}
+void Channel::setrevents(uint32_t ev)//设置revents_成员的值为参数ev
+{
+    revents_=ev;
+}
+bool Channel::inpoll()      //返回inepoll_成员的值
+{
+    return inepoll_;
+}
+uint32_t Channel::events()  //返回events_成员的值
+{
+    return events_;
+}
+uint32_t Channel::revents()  //返回revents_成员的值
+{
+    return revents_;
+}
+
+void Channel::handleevent(Socket *servsock)
+{
+    //如果客户端连接的sock有事件，表示有报文发过来或者链接已经断开
+    //////////////////////////////
+    if(revents_&EPOLLRDHUP)//对方已经关闭连接，有些系统检测不到，可以使用EPOLLIN，recv()返回
+    {
+        //如果客户端已经断开
+        printf("client(eventfd=%d)disconnected.\n",fd_);
+        close(fd_);//关闭客户端的fd
+    }
+    else if(revents_&(EPOLLIN|EPOLLPRI))//接受区有数据可以读
+    {
+        //如果发生事件的是listensock，表示有新的客户端连上来
+        if(islisten_)
+        {
+            InetAddress clientaddr;
+            Socket* clientsock=new Socket(servsock->accept(clientaddr));
+
+            printf("accept client(fd=%d,ip=%s,port=%d)ok.\n",clientsock->fd(),clientaddr.ip(),clientaddr.port());
+
+            //为新客户准备可读事件，并添加到epoll中
+            Channel * clientchannel=new Channel(ep_,clientsock->fd(),false);
+            clientchannel->useet();
+            clientchannel->enablereading();
+        }
+        else
+        {
+            char buffer[1024];//存放从客户端读取的数据
+            while(true)//使用非阻塞IO，一次读取buffer大小数据，直到全部读取完
+            {
+                bzero(&buffer,sizeof(buffer));
+                ssize_t nread = read(fd_,buffer,sizeof(buffer));
+                if(nread>0)//成功读取到了数据
+                {
+                    //把接收到的数据原封不动的返回回去
+                    printf("recv(eventfd=%d);%s\n",fd_,buffer);
+                    send(fd_,buffer,strlen(buffer),0);
+                }
+                else if(nread==-1&&errno==EINTR)//读取数据的时候信号中断，继续读取
+                {
+                    continue;
+                }
+                else if(nread==-1&&((errno==EAGAIN)||(errno==EWOULDBLOCK)))//全部的数据已读取完必
+                {
+                    break;
+                }
+                else if(nread==0)//客户端连接已经断开
+                {
+                    printf("client(eventfd=%d) disconnected.\n",fd_);
+                    close(fd_);
+                    break;
+                }
+            }
+        }
+        
+    }
+    else if(revents_&EPOLLOUT)//有数据要写，暂时没代码，以后在说
+    {
+
+    }
+    else //其他事件，都视为错误,或者对方关闭了链接。
+    {
+        printf("client(eventfd=%d)error.\n",fd_);
+        close(fd_);
+    }
+    /////////////////////////////
+}
+````
+
+### 修改服务端   
+````
+/*
+ *此程序用于演示epoll模型实现网络通信服务端
+ */
+#include<stdio.h>
+#include<unistd.h>
+#include<stdlib.h>
+#include<string.h>
+#include<errno.h>
+#include<sys/socket.h>
+#include<sys/types.h>
+#include<arpa/inet.h>
+#include<sys/fcntl.h>
+#include<sys/epoll.h>
+#include<netinet/tcp.h>// TCP_NODELAY需要包含这个头文件
+#include"InetAddress.h"//TCP_NODELAY用于禁用Nagle算法
+#include"Socket.h"
+#include"Epoll.h"
 
 
+int main(int argc,char* argv[])
+{
+    
+    if(argc!=3)
+    {
+        printf("usage: ./tcpepoll ip port\n");
+        printf("example: ./tcpepoll 192.168.157.128 5005\n");
+        return -1;
+    }
 
+    Socket servsock(createnonblocking());
+    InetAddress servaddr(argv[1],atoi(argv[2]));
+    servsock.setreuseaddr(true);
+    servsock.settcpnodelay(true);
+    servsock.setreuseport(true);
+    servsock.setkeepalive(true);
+    servsock.bind(servaddr);
+    servsock.listen();
 
+    Epoll ep;
+    //ep.addfd(servsock.fd(),EPOLLIN);//水平触发，监听listenfd的读事件
+    Channel * servchannel=new Channel(&ep,servsock.fd(),true);
+    servchannel->enablereading();
+    
+    while(1)//事件循环
+    {
+        std::vector<Channel*>channels=ep.loop();  //等待监视的fd有事件发生
+
+        //如果infds>0,表示有事件发生的socket的数量
+        for(auto& ch:channels)
+        {
+            ch->handleevent(&servsock);
+                
+        }
+    }
+    return 0;
+}
+````
 
 
