@@ -2308,4 +2308,129 @@ int main(int argc,char* argv[])
 }
 ````
 
+# 增加EventLoop事件循环类  
+### EventLoop头文件  
+````
+#pragma once
+#include "Epoll.h"
+
+//事件循环类
+class EventLoop
+{
+private:
+    Epoll *ep_;     //每个事件循环只有一个epoll
+
+public:
+    EventLoop();    //在构造函数中创建epoll对象ep_
+    ~EventLoop();   //在析构函数中销毁ep_
+    void run();     //运行事件循环
+    Epoll* ep();    //返回ep_地址
+};
+````
+
+### EventLoop源文件  
+````
+#include"EventLoop.h"
+
+EventLoop::EventLoop():ep_(new Epoll)    //在构造函数中创建epoll对象ep_
+{
+
+}
+EventLoop::~EventLoop()   //在析构函数中销毁ep_
+{
+    delete ep_;
+}
+void EventLoop::run()     //运行事件循环
+{
+    while(1)//事件循环
+    {
+        std::vector<Channel*>channels=ep_->loop();  //等待监视的fd有事件发生
+
+        //如果infds>0,表示有事件发生的socket的数量
+        for(auto& ch:channels)
+        {
+            ch->handleevent();
+                
+        }
+    }
+}
+
+Epoll* EventLoop::ep()    //返回ep_地址
+{
+    return ep_;
+}
+
+````
+
+### Makefile
+````
+all:client tcpepoll
+
+client:client.cpp
+	g++ -g client.cpp -o client
+
+tcpepoll:tcpepoll.cpp InetAddress.cpp Socket.cpp Epoll.cpp Channel.cpp EventLoop.cpp
+	g++ -g tcpepoll.cpp InetAddress.cpp Socket.cpp Epoll.cpp Channel.cpp EventLoop.cpp -o tcpepoll
+
+clean:
+	rm -f client tcpepoll
+````
+
+### 修改服务端  
+````
+/*
+ *此程序用于演示epoll模型实现网络通信服务端
+ */
+#include<stdio.h>
+#include<unistd.h>
+#include<stdlib.h>
+#include<string.h>
+#include<errno.h>
+#include<sys/socket.h>
+#include<sys/types.h>
+#include<arpa/inet.h>
+#include<sys/fcntl.h>
+#include<sys/epoll.h>
+#include<netinet/tcp.h>// TCP_NODELAY需要包含这个头文件
+#include"InetAddress.h"//TCP_NODELAY用于禁用Nagle算法
+#include"Socket.h"
+#include"Epoll.h"
+#include"EventLoop.h"
+
+
+int main(int argc,char* argv[])
+{
+    
+    if(argc!=3)
+    {
+        printf("usage: ./tcpepoll ip port\n");
+        printf("example: ./tcpepoll 192.168.157.128 5005\n");
+        return -1;
+    }
+
+    Socket servsock(createnonblocking());
+    InetAddress servaddr(argv[1],atoi(argv[2]));
+    servsock.setreuseaddr(true);
+    servsock.settcpnodelay(true);
+    servsock.setreuseport(true);
+    servsock.setkeepalive(true);
+    servsock.bind(servaddr);
+    servsock.listen();
+
+
+    EventLoop loop;
+    
+    Channel * servchannel=new Channel(loop.ep(),servsock.fd());
+    servchannel->setreadcallback(std::bind(&Channel::newconnection,servchannel,&servsock));
+    servchannel->enablereading();
+
+    loop.run();
+    
+    return 0;
+}
+````
+
+
+
+
 
