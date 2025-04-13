@@ -299,7 +299,44 @@ int main() {
 ````
 
 
+### 拓扑排序
+leetcode207  
+````
+class Solution {
+public:
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        vector<int> indegree(numCourses,0);//入度
+        vector<vector<int>> adj(numCourses);//邻接表
+        for(auto& vec:prerequisites)
+        {
+            adj[vec[1]].push_back(vec[0]);//创建邻接表（后继）
+            indegree[vec[0]]++;//增加入度
+        }
 
+        queue<int> q;
+        for(int i=0;i<numCourses;i++)
+        {
+            if(indegree[i]==0) q.push(i);//压入入度为0的节点
+        }
+
+        int num=0;
+        while(!q.empty())
+        {
+            int index=q.front();
+            q.pop();
+            num++;
+
+            for(int j:adj[index])
+            {
+                indegree[j]--;
+                if(indegree[j]==0) q.push(j);
+            }
+        }
+
+        return num==numCourses;
+    }
+};
+````
 
 # 练习  
 215  
