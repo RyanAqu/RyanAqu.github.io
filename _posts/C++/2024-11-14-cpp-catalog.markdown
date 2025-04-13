@@ -39,7 +39,7 @@ tags:
 [搜索算法](https://ryanaqu.github.io/2025/01/06/cpp-algorithm-search/)  
 [回溯算法](https://ryanaqu.github.io/2025/01/07/cpp-algorithm-backtrack/)  
 [动态规划](https://ryanaqu.github.io/2025/01/08/cpp-algorithm-dp/)  
-[置换图]()  
+[置换环](https://ryanaqu.github.io/2025/01/08/cpp-algorithm-sloop/)  
 
 ## 数据结构  
 [二叉树和搜索树](https://ryanaqu.github.io/2025/01/09/cpp-datastruct-binarytree/)  
