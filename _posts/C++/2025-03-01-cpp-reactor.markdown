@@ -2809,6 +2809,167 @@ int main(int argc,char* argv[])
 
 ````
 
+# 封装Acceptor类  
+**WHY：**
+* channel封装了监听fd和服务端连上来的fd
+* 监听的fd和服务端连上来的fd的功能是不同的
+* 监听的fd生命周期是永久的，连上来的客户端fd生命周期是有限的
+
+
+Acceptor类是封装在channel之上的，Connection也是；  
+Acceptor类和Connection都是TcpServer类管理的；  
+Acceptor是负责监听的类；  
+
+### Acceptor类头文件  
+````
+#pragma once
+#include <functional>
+#include "Socket.h"
+#include "InetAddress.h"
+#include "Channel.h"
+#include "EventLoop.h"
+
+class Acceptor
+{
+private:
+    EventLoop *loop_;               // Acceptor对应的事件循环，在构造函数中传入。 
+    Socket *servsock_;               // 服务端用于监听的socket，在构造函数中创建。
+    Channel *acceptchannel_;   // Acceptor对应的channel，在构造函数中创建。
+public:
+    Acceptor(EventLoop *loop,const std::string &ip,const uint16_t port);
+    ~Acceptor();
+};
+
+````
+
+### Acceptor源头文件  
+`````
+#include "Acceptor.h"
+
+Acceptor::Acceptor(EventLoop *loop,const std::string &ip,const uint16_t port):loop_(loop)
+{
+    servsock_=new Socket(createnonblocking());   
+    InetAddress servaddr(ip,port);             // 服务端的地址和协议。
+    servsock_->setreuseaddr(true);
+    servsock_->settcpnodelay(true);
+    servsock_->setreuseport(true);
+    servsock_->setkeepalive(true);
+    servsock_->bind(servaddr);
+    servsock_->listen();
+
+    acceptchannel_=new Channel(loop_,servsock_->fd());       
+    acceptchannel_->setreadcallback(std::bind(&Channel::newconnection,acceptchannel_,servsock_));
+    acceptchannel_->enablereading();       // 让epoll_wait()监视servchannel的读事件。 
+}
+
+Acceptor::~Acceptor()
+{
+    delete servsock_;
+    delete acceptchannel_;
+}
+`````
+
+### 修改TcpServer类  
+````
+#pragma once
+#include "EventLoop.h"
+#include "Socket.h"
+#include "Channel.h"
+#include "Acceptor.h"
+
+// TCP网络服务类。
+class TcpServer
+{
+private:
+    EventLoop loop_;         // 一个TcpServer可以有多个事件循环，现在是单线程，暂时只用一个事件循环。
+    Acceptor *acceptor_;   // 一个TcpServer只有一个Acceptor对象。
+public:
+    TcpServer(const std::string &ip,const uint16_t port);
+    ~TcpServer();
+
+    void start();          // 运行事件循环。
+};
+/////////////////////////////////////////////////////
+#include "TcpServer.h"
+
+TcpServer::TcpServer(const std::string &ip,const uint16_t port)
+{
+    /*
+    Socket *servsock=new Socket(createnonblocking());   // 这里new出来的对象没有释放，以后再说。
+    InetAddress servaddr(ip,port);             // 服务端的地址和协议。
+    servsock->setreuseaddr(true);
+    servsock->settcpnodelay(true);
+    servsock->setreuseport(true);
+    servsock->setkeepalive(true);
+    servsock->bind(servaddr);
+    servsock->listen();
+
+    Channel *servchannel=new Channel(&loop_,servsock->fd());       // 这里new出来的对象没有释放，这个问题以后再解决。
+    servchannel->setreadcallback(std::bind(&Channel::newconnection,servchannel,servsock));
+    servchannel->enablereading();       // 让epoll_wait()监视servchannel的读事件。 
+    */
+    acceptor_=new Acceptor(&loop_,ip,port);
+}
+
+TcpServer::~TcpServer()
+{
+    delete acceptor_;
+}
+
+// 运行事件循环。
+void TcpServer::start()          
+{
+    loop_.run();
+}
+````
+
+
+# 封装Connection类  
+* Connection类负责连接上来的fd，对应的channel
+* Connection类负责将脸上来的fd放到对应eventloop
+
+### Connection类头文件
+````
+#pragma once
+#include <functional>
+#include "Socket.h"
+#include "InetAddress.h"
+#include "Channel.h"
+#include "EventLoop.h"
+
+class Connection
+{
+private:
+    EventLoop *loop_;               // Connection对应的事件循环，在构造函数中传入。 
+    Socket *clientsock_;             // 与客户端通讯的Socket。
+    Channel *clientchannel_;     // Connection对应的channel，在构造函数中创建。
+public:
+    Connection(EventLoop *loop,Socket *clientsock);
+    ~Connection();
+};
+
+````
+
+### Connection类源文件
+````
+#include "Connection.h"
+
+
+Connection::Connection(EventLoop *loop,Socket *clientsock):loop_(loop),clientsock_(clientsock)
+{
+    // 为新客户端连接准备读事件，并添加到epoll中。
+    clientchannel_=new Channel(loop_,clientsock_->fd());   
+    clientchannel_->setreadcallback(std::bind(&Channel::onmessage,clientchannel_));
+    clientchannel_->useet();                 // 客户端连上来的fd采用边缘触发。
+    clientchannel_->enablereading();   // 让epoll_wait()监视clientchannel的读事件
+}
+
+Connection::~Connection()
+{
+    delete clientsock_;
+    delete clientchannel_;
+}
+````
 
 
 
