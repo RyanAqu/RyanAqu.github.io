@@ -461,6 +461,8 @@ int main(int argc,char* argv[])
 
 
 # 封装InetAddress类  
+Inet类用于创建ip地址和port端口，比如在main函数里面利用main输入参数ip和port直接构造用于监听的InetAddress，这个地址和端口接下来会被bind绑定到特定的listenfd。  
+
 ### 头文件  
 ````
 #pragma once
@@ -740,6 +742,8 @@ int main(int argc,char* argv[])
 ````
 
 # 封装socket类  
+传入fd，socket类来修饰非阻塞的网络套接字，修饰需要的fd文件描述符，并为之设置一些socket属性，网络通信是通过fd实现的。比如通过createnonblocking函数创建一个非阻塞的套接字，然后传入socket类进行修饰。    
+除此之外，socket类还封装了一些对fd的基础网络操作，比如listen、accept、bind等。  
 ### 头文件  
 ````
 #pragma once
@@ -1069,6 +1073,9 @@ int main(int argc,char* argv[])
 ````
 
 # 封装epoll类  
+epoll类把epollfd的句柄式创建变成了创建类的对象，对epollfd进行管理，对epoll的create和wait系统调用等进行了封装，每个epoll监控一棵红黑树，监控一个事件循环loop，并且更新epoll监控的channel，每个channel有自己的fd以及对应的感兴趣的事件类型；  
+epoll类还暴露了对外的添加事件的接口，用于channel类进行添加；  
+epoll类还要监控事件循环，用指针把对应事件传递给对应的channel，并且把返回事件的处理交给事件循环loop类进行运作，返还给对应channel进行回调处理；  
 ### 头文件  
 ````
 #pragma once
@@ -1289,6 +1296,11 @@ int main(int argc,char* argv[])
 ````
 
 # 封装Channel类  
+channel类封装了单个fd对应的关注的事件和类型，每个channel创建时需要知道自己对应的fd和epoll红黑树；   
+channel类主要封装了回调函数来处理各个事件，比如有连接断开，有数据发送过来，有数据需要发送；  
+channel类还要设置事件对应的回调函数；  
+channel类设置完以后要调用updatechannel使得红黑树关注新事件；  
+
 ### epoll结构体  
 epoll 是 Linux 中用于高效 I/O 事件通知的机制，特别适合处理大量文件描述符（如网络套接字）。它的核心是三个系统调用：epoll_create、epoll_ctl 和 epoll_wait，以及一个关键的数据结构 struct epoll_event。  
 ````
@@ -2309,6 +2321,9 @@ int main(int argc,char* argv[])
 ````
 
 # 增加EventLoop事件循环类  
+eventloop类封装了事件循环，每个eventloop都会创建一个epoll，事件循环对应一棵红黑树的生命周期；  
+eventloop类通过run函数运行事件循环，接收红黑树监控的channel并且回调处理；  
+
 ### EventLoop头文件  
 ````
 #pragma once
@@ -2431,10 +2446,267 @@ int main(int argc,char* argv[])
 ````
 
 
-# 少了EventLoop和Channel的连接处理没做
+# EventLoop和Channel的连接处理  
+这里eventloop包装了epoll类，channel直接与eventloop链接，eventloop内部处理epoll；  
+channel和对应一个eventloop，也就对应一个epoll；  
+### 修改eventloop类  
+````
+#pragma once
+#include "Epoll.h"
+
+class Channel;
+class Epoll;
+
+// 事件循环类。
+class EventLoop
+{
+private:
+    Epoll *ep_;                       // 每个事件循环只有一个Epoll。
+public:
+    EventLoop();                   // 在构造函数中创建Epoll对象ep_。
+    ~EventLoop();                // 在析构函数中销毁ep_。
+
+    void run();                      // 运行事件循环。
+
+    void updatechannel(Channel *ch);      // 把channel添加/更新到红黑树上，channel中有fd，也有需要监视的事件。
+};
+
+///////////////////////////////////////////////
+#include "EventLoop.h"
+
+/*
+// 事件循环类。
+class EventLoop
+{
+private:
+    Epoll *ep_;                       // 每个事件循环只有一个Epoll。
+public:
+    EventLoop();                   // 在构造函数中创建Epoll对象ep_。
+    ~EventLoop();                // 在析构函数中销毁ep_。
+
+    void run();                      // 运行事件循环。
+};
+*/
+
+
+// 在构造函数中创建Epoll对象ep_。
+EventLoop::EventLoop():ep_(new Epoll)                   
+{
+
+}
+
+// 在析构函数中销毁ep_。
+EventLoop::~EventLoop()
+{
+    delete ep_;
+}
+
+// 运行事件循环。
+void EventLoop::run()                      
+{
+    while (true)        // 事件循环。
+    {
+       std::vector<Channel *> channels=ep_->loop();         // 等待监视的fd有事件发生。
+
+        for (auto &ch:channels)
+        {
+            ch->handleevent();        // 处理epoll_wait()返回的事件。
+        }
+    }
+}
+
+// 把channel添加/更新到红黑树上，channel中有fd，也有需要监视的事件。
+void EventLoop::updatechannel(Channel *ch)                        
+{
+    ep_->updatechannel(ch);
+}
+````
+
+### 修改channel类  
+其实就是之前用的epoll，现在改成eventloop的了；  
+````
+#pragma once
+#include <sys/epoll.h>
+#include <functional>
+#include "EventLoop.h"
+#include "InetAddress.h"
+#include "Socket.h"
+ 
+class EventLoop;
+
+class Channel
+{
+private:
+    int fd_=-1;                             // Channel拥有的fd，Channel和fd是一对一的关系。
+    // Epoll *ep_=nullptr;                // Channel对应的红黑树，Channel与Epoll是多对一的关系，一个Channel只对应一个Epoll。
+    EventLoop *loop_=nullptr;   // Channel对应的事件循环，Channel与EventLoop是多对一的关系，一个Channel只对应一个EventLoop。
+    bool inepoll_=false;              // Channel是否已添加到epoll树上，如果未添加，调用epoll_ctl()的时候用EPOLL_CTL_ADD，否则用EPOLL_CTL_MOD。
+    uint32_t events_=0;              // fd_需要监视的事件。listenfd和clientfd需要监视EPOLLIN，clientfd还可能需要监视EPOLLOUT。
+    uint32_t revents_=0;             // fd_已发生的事件。 
+    std::function<void()> readcallback_;         // fd_读事件的回调函数。
+
+public:
+    Channel(EventLoop* loop,int fd);      // 构造函数。
+    ~Channel();                           // 析构函数。 
+
+    int fd();                                            // 返回fd_成员。
+    void useet();                                    // 采用边缘触发。
+    void enablereading();                     // 让epoll_wait()监视fd_的读事件。
+    void setinepoll();                            // 把inepoll_成员的值设置为true。
+    void setrevents(uint32_t ev);         // 设置revents_成员的值为参数ev。
+    bool inpoll();                                  // 返回inepoll_成员。
+    uint32_t events();                           // 返回events_成员。
+    uint32_t revents();                          // 返回revents_成员。 
+
+    void handleevent();         // 事件处理函数，epoll_wait()返回的时候，执行它。
+
+    void newconnection(Socket *servsock);    // 处理新客户端连接请求。
+    void onmessage();                                     // 处理对端发送过来的消息。
+    void setreadcallback(std::function<void()> fn);    // 设置fd_读事件的回调函数。
+};
+/////////////////////////////////////////////////////////////////
+#include "Channel.h"
+
+Channel::Channel(EventLoop* loop,int fd):loop_(loop),fd_(fd)      // 构造函数。
+{
+
+}
+
+Channel::~Channel()                           // 析构函数。 
+{
+    // 在析构函数中，不要销毁loop_，也不能关闭fd_，因为这两个东西不属于Channel类，Channel类只是需要它们，使用它们而已。
+}
+
+int Channel::fd()                                            // 返回fd_成员。
+{
+    return fd_;
+}
+
+void Channel::useet()                                    // 采用边缘触发。
+{
+    events_=events_|EPOLLET;
+}
+
+void Channel::enablereading()                     // 让epoll_wait()监视fd_的读事件。
+{
+    events_|=EPOLLIN;
+    // ep_->updatechannel(this);
+    loop_->updatechannel(this);
+}
+
+void Channel::setinepoll()                           // 把inepoll_成员的值设置为true。
+{
+    inepoll_=true;
+}
+
+void Channel::setrevents(uint32_t ev)         // 设置revents_成员的值为参数ev。
+{
+    revents_=ev;
+}
+
+bool Channel::inpoll()                                  // 返回inepoll_成员。
+{
+    return inepoll_;
+}
+
+uint32_t Channel::events()                           // 返回events_成员。
+{
+    return events_;
+}
+
+uint32_t Channel::revents()                          // 返回revents_成员。
+{
+    return revents_;
+} 
+
+// 事件处理函数，epoll_wait()返回的时候，执行它。
+void Channel::handleevent()
+{
+    if (revents_ & EPOLLRDHUP)                     // 对方已关闭，有些系统检测不到，可以使用EPOLLIN，recv()返回0。
+    {
+        printf("client(eventfd=%d) disconnected.\n",fd_);
+        close(fd_);            // 关闭客户端的fd。
+    }                                //  普通数据  带外数据
+    else if (revents_ & (EPOLLIN|EPOLLPRI))   // 接收缓冲区中有数据可以读。
+    {
+        /*
+        if (islisten_==true)   // 如果是listenfd有事件，表示有新的客户端连上来。
+            newconnection(servsock);
+        else                          // 如果是客户端连接的fd有事件。
+            onmessage();
+        */
+        readcallback_();
+    }
+    else if (revents_ & EPOLLOUT)                  // 有数据需要写，暂时没有代码，以后再说。
+    {
+    }
+    else                                                                   // 其它事件，都视为错误。
+    {
+        printf("client(eventfd=%d) error.\n",fd_);
+        close(fd_);            // 关闭客户端的fd。
+    }
+}
+
+// 处理新客户端连接请求。
+void Channel::newconnection(Socket *servsock)    
+{
+    InetAddress clientaddr;             // 客户端的地址和协议。
+    // 注意，clientsock只能new出来，不能在栈上，否则析构函数会关闭fd。
+    // 还有，这里new出来的对象没有释放，这个问题以后再解决。
+    Socket *clientsock=new Socket(servsock->accept(clientaddr));
+
+    printf ("accept client(fd=%d,ip=%s,port=%d) ok.\n",clientsock->fd(),clientaddr.ip(),clientaddr.port());
+
+    // 为新客户端连接准备读事件，并添加到epoll中。
+    Channel *clientchannel=new Channel(loop_,clientsock->fd());   // 这里new出来的对象没有释放，这个问题以后再解决。
+    clientchannel->setreadcallback(std::bind(&Channel::onmessage,clientchannel));
+    clientchannel->useet();                 // 客户端连上来的fd采用边缘触发。
+    clientchannel->enablereading();   // 让epoll_wait()监视clientchannel的读事件
+}
+
+// 处理对端发送过来的消息。
+void Channel::onmessage()
+{
+    char buffer[1024];
+    while (true)             // 由于使用非阻塞IO，一次读取buffer大小数据，直到全部的数据读取完毕。
+    {    
+        bzero(&buffer, sizeof(buffer));
+        ssize_t nread = read(fd_, buffer, sizeof(buffer));
+        if (nread > 0)      // 成功的读取到了数据。
+        {
+            // 把接收到的报文内容原封不动的发回去。
+            printf("recv(eventfd=%d):%s\n",fd_,buffer);
+            send(fd_,buffer,strlen(buffer),0);
+        } 
+        else if (nread == -1 && errno == EINTR) // 读取数据的时候被信号中断，继续读取。
+        {  
+            continue;
+        } 
+        else if (nread == -1 && ((errno == EAGAIN) || (errno == EWOULDBLOCK))) // 全部的数据已读取完毕。
+        {
+            break;
+        } 
+        else if (nread == 0)  // 客户端连接已断开。
+        {  
+            printf("client(eventfd=%d) disconnected.\n",fd_);
+            close(fd_);            // 关闭客户端的fd。
+            break;
+        }
+    }
+}
+
+ // 设置fd_读事件的回调函数。
+ void Channel::setreadcallback(std::function<void()> fn)    
+ {
+    readcallback_=fn;
+ }
+````
+
 
 
 # 封装TcpServer类  
+tcpserver封装了服务端创建socket套接字，对套接字进行一系列的属性设置，以及运行事件循环的功能。  
+
 ### TcpServer头文件  
 ````
 #pragma once 
@@ -2455,12 +2727,22 @@ public:
 
 ### TcpServer源文件  
 ````
-#include"TcpServer.h"
+#include "TcpServer.h"
+
+/*
+class TcpServer
+{
+private:
+    EventLoop loop_;         // 一个TcpServer可以有多个事件循环，现在是单线程，暂时只用一个事件循环。
+public:
+    TcpServer(const std::string &ip,const uint16_t port);
+    ~TcpServer();
+};*/
 
 TcpServer::TcpServer(const std::string &ip,const uint16_t port)
 {
-    Socket * servsock=new Socket(createnonblocking());
-    InetAddress servaddr(ip,port);
+    Socket *servsock=new Socket(createnonblocking());   // 这里new出来的对象没有释放，以后再说。
+    InetAddress servaddr(ip,port);             // 服务端的地址和协议。
     servsock->setreuseaddr(true);
     servsock->settcpnodelay(true);
     servsock->setreuseport(true);
@@ -2468,23 +2750,21 @@ TcpServer::TcpServer(const std::string &ip,const uint16_t port)
     servsock->bind(servaddr);
     servsock->listen();
 
-
-    EventLoop loop;
-    
-    Channel * servchannel=new Channel(loop.ep(),servsock->fd());
+    Channel *servchannel=new Channel(&loop_,servsock->fd());       // 这里new出来的对象没有释放，这个问题以后再解决。
     servchannel->setreadcallback(std::bind(&Channel::newconnection,servchannel,servsock));
-    servchannel->enablereading();
+    servchannel->enablereading();       // 让epoll_wait()监视servchannel的读事件。
 }
+
 TcpServer::~TcpServer()
 {
 
 }
 
-void TcpServer::start()
+// 运行事件循环。
+void TcpServer::start()          
 {
     loop_.run();
 }
-
 ````
 
 ### Makefile
@@ -2523,10 +2803,6 @@ int main(int argc,char* argv[])
     TcpServer tcpserver(argv[1],atoi(argv[2]));
 
     tcpserver.start();
-    
-
-    
-
 
     return 0;
 }
