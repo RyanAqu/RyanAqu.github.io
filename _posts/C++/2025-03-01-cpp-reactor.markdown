@@ -3113,6 +3113,8 @@ void Channel::onmessage()
 # 在Acceptor类中回调TcpServer类的成员函数
 
 
+# buffer类  
+![image](https://github.com/user-attachments/assets/b854bd5d-8914-4234-b440-7f5b1dc9092f)
 
 
 
