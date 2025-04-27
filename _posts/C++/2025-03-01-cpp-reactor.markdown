@@ -3116,7 +3116,9 @@ void Channel::onmessage()
 # buffer类  
 ![image](https://github.com/user-attachments/assets/b854bd5d-8914-4234-b440-7f5b1dc9092f)
 
+![image](https://github.com/user-attachments/assets/9d7d23cc-75ff-4fff-b69e-77a5d9344bc2)
 
+![image](https://github.com/user-attachments/assets/e1e592e6-8c82-4270-8d68-b9c385968e0e)
 
 
 
