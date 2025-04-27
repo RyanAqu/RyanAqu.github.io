@@ -3121,5 +3121,10 @@ void Channel::onmessage()
 ![image](https://github.com/user-attachments/assets/e1e592e6-8c82-4270-8d68-b9c385968e0e)
 
 
+# 目前的回调关系  
+![image](https://github.com/user-attachments/assets/1dc1699c-ac46-4b36-9eef-83baa18a5b03)  
+
+
+
 
 
