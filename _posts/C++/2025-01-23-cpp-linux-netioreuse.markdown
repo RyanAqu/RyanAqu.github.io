@@ -108,14 +108,14 @@ TCP 四次挥手用于断开连接，确保双方都能安全地关闭通信。�
 粘包: tcp接收到数据之后，有序放在接收缓冲区中，数据之间不存在分隔符的说法，如果接收方没有及时的从缓冲区中取走数据，看上去就象粘在了一起。  
 分包: tcp报文的大小缺省是1460字节，如果发送缓冲区中的数据超过1460字节，tcp将拆分成多个包发送，如果接收方及时的从接收缓冲区中取走了数据，看上去像就接收到了多个报文。
 
-![image](https://github.com/user-attachments/assets/076eab1b-9ff2-4c89-bddd-e919601937de)
+![image](https://ryanaqu.github.io/img/inpost_cpp/image7.png)  
 
 ### 解决方法  
 * 发送固定长度报文，服务端接收固定长度
 * 报头是一个四字节的整数，说明报文的长度，服务端先读取长度再进行定长读取
 * 报文分隔符
 
-![image](https://github.com/user-attachments/assets/696af75a-886a-4268-8b0f-d96f6da0c38f)
+![image](https://ryanaqu.github.io/img/inpost_cpp/image8.png)  
 
 
 # HTTPS  
