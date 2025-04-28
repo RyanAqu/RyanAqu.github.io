@@ -3114,19 +3114,20 @@ void Channel::onmessage()
 
 
 # buffer类  
-![image](https://github.com/user-attachments/assets/b854bd5d-8914-4234-b440-7f5b1dc9092f)
+![image](https://ryanaqu.github.io/img/inpost_cpp/image9.png)
 
-![image](https://github.com/user-attachments/assets/9d7d23cc-75ff-4fff-b69e-77a5d9344bc2)
+![image](https://ryanaqu.github.io/img/inpost_cpp/image10.png)
 
-![image](https://github.com/user-attachments/assets/e1e592e6-8c82-4270-8d68-b9c385968e0e)
+![image](https://ryanaqu.github.io/img/inpost_cpp/image11.png)
 
 
 # 目前的回调关系  
-![image](https://github.com/user-attachments/assets/1dc1699c-ac46-4b36-9eef-83baa18a5b03)  
+![image](https://ryanaqu.github.io/img/inpost_cpp/image12.png) 
 
 # 多线程设计  
-![image](https://github.com/user-attachments/assets/df61a183-60d8-4fca-b13a-76843e173783)   
+![image](https://ryanaqu.github.io/img/inpost_cpp/image13.png)  
 
-
+# 增加工作线程  
+![image](https://ryanaqu.github.io/img/inpost_cpp/image14.png)  
 
 
