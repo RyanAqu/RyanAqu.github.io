@@ -3124,6 +3124,8 @@ void Channel::onmessage()
 # 目前的回调关系  
 ![image](https://github.com/user-attachments/assets/1dc1699c-ac46-4b36-9eef-83baa18a5b03)  
 
+# 多线程设计  
+![image](https://github.com/user-attachments/assets/df61a183-60d8-4fca-b13a-76843e173783)   
 
 
 
