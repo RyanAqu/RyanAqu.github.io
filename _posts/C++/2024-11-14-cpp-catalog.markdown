@@ -33,13 +33,15 @@ tags:
 # 基础算法&数据结构  
 ## 算法  
 [贪心算法](https://ryanaqu.github.io/2025/01/05/cpp-algorithm-greedy/)  
-[千奇百怪的排序算法](https://ryanaqu.github.io/2025/01/05/cpp-algorithm-sort/)  
+[排序算法](https://ryanaqu.github.io/2025/01/05/cpp-algorithm-sort/)  
 [双指针](https://ryanaqu.github.io/2025/01/05/cpp-algorithm-twopointers/)  
 [二分查找](https://ryanaqu.github.io/2025/01/06/cpp-algorithm-binarysearch/)  
 [搜索算法](https://ryanaqu.github.io/2025/01/06/cpp-algorithm-search/)  
 [回溯算法](https://ryanaqu.github.io/2025/01/07/cpp-algorithm-backtrack/)  
 [动态规划](https://ryanaqu.github.io/2025/01/08/cpp-algorithm-dp/)  
-[置换环](https://ryanaqu.github.io/2025/01/08/cpp-algorithm-sloop/)  
+[置换环](https://ryanaqu.github.io/2025/01/08/cpp-algorithm-sloop/)    
+[背包问题](https://ryanaqu.github.io/2025/01/08/cpp-algorithm-packet/)  
+
 
 ## 数据结构  
 [二叉树和搜索树](https://ryanaqu.github.io/2025/01/09/cpp-datastruct-binarytree/)  
